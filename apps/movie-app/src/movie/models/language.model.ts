@@ -1,6 +1,6 @@
 import {BelongsToMany, Column, DataType, Model, Table} from "sequelize-typescript";
 import {Movie} from "./movie.model";
-import {MovieGenre} from "./movie-genre.model";
+import {MovieLanguage} from "./movie-language.model";
 
 interface LanguageCreationAttrs {
     name: string;
@@ -14,6 +14,6 @@ export class Language extends Model<Language, LanguageCreationAttrs> {
     @Column({type: DataType.STRING, unique: true, allowNull: false})
     name: string;
 
-    @BelongsToMany(() => Movie, () => MovieGenre)
+    @BelongsToMany(() => Movie, () => MovieLanguage)
     movies: Movie[];
 }

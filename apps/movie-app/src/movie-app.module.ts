@@ -3,7 +3,6 @@ import {MovieModule} from "./movie/movie.module";
 import {CommentModule} from './comment/comment.module';
 import {PersonModule} from "./person/person.module";
 import {SequelizeModule} from "@nestjs/sequelize";
-import process from "process";
 import {MoviePerson} from "./person/models/movie-person.model";
 import {Person} from "./person/models/person.model";
 import {Movie} from "./movie/models/movie.model";
@@ -21,11 +20,11 @@ import {SimilarMovies} from "./movie/models/similar-movies.model";
   imports: [
       SequelizeModule.forRoot({
           dialect: 'postgres',
-          host: process.env.POSTGRES_URL,
-          port: Number(process.env.POSTGRES_PORT),
-          username: process.env.POSTGRES_USERNAME,
-          password: process.env.POSTGRES_PASSWORD,
-          database: process.env.POSTGRES_DATABASE,
+          host: 'localhost',
+          port: 5555,
+          username: 'postgres',
+          password: 'BranteDeBurbon_21',
+          database: 'movie',
           models: [
               Movie,
               Person,
