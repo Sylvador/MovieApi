@@ -3,9 +3,10 @@ import {Movie} from "../../movie/models/movie.model";
 
 interface CommentCreationAttrs {
     movieId: number;
+    userName: string;
+    publishDate: Date;
     value: string;
-    type: string;
-    spoiler: boolean;
+    parentId: number;
 }
 
 @Table({tableName: 'comment', createdAt: false, updatedAt: false})
