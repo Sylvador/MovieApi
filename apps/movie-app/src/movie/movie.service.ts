@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import {InjectModel} from "@nestjs/sequelize";
 import {Movie} from "./models/movie.model";
+import {PersonProfession} from "../person/models/person-profession.model";
+import {Person} from "../person/models/person.model";
+import {Profession} from "../person/models/profession.model";
 import {FindOneMovieDto} from "./dto/findOne-movie.dto";
 
 @Injectable()
@@ -11,8 +14,12 @@ export class MovieService {
     return `This action returns all movie`;
   }
 
-  async findOne(id: number): Promise<FindOneMovieDto> {
-    const movie: Movie = await this.movieRepository.findByPk(id, {include: {all: true}});
+  async findOne(id: number) {
+    const movie: Movie = await this.movieRepository.findByPk(id, {
+      include: [
+        {all: true},
+        {model: PersonProfession, include: [{model: Person}, {model: Profession}]},
+      ]});
     return new FindOneMovieDto(movie);
   }
 

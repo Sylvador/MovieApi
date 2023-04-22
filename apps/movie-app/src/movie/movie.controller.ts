@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { MovieService } from './movie.service';
 import { UpdateMovieDto } from './dto/update-movie.dto';
-import {FindOneMovieDto} from "./dto/findOne-movie.dto";
+import {Movie} from "./models/movie.model";
 
 @Controller()
 export class MovieController {
@@ -14,7 +14,7 @@ export class MovieController {
   }
 
   @MessagePattern('findOneMovie')
-  findOne(@Payload() id: number): Promise<FindOneMovieDto> {
+  findOne(@Payload() id: number) {
     return this.movieService.findOne(id);
   }
 
