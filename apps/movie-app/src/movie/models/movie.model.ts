@@ -15,6 +15,7 @@ interface MovieCreationAttrs {
     movieId: number;
     name: string;
     enName: string;
+    type: string;
     rating: number;
     votes: number;
     movieLength: number;
@@ -23,7 +24,6 @@ interface MovieCreationAttrs {
     slogan: string;
     shortDescription: string;
     ageRating: number;
-    hasFullHD: number;
     poster: string;
     trailer: string;
 }
@@ -38,6 +38,9 @@ export class Movie extends Model<Movie, MovieCreationAttrs> {
 
     @Column({type: DataType.STRING})
     enName: string;
+
+    @Column({type: DataType.STRING})
+    type: string;
 
     @Column({type: DataType.REAL})
     rating: number;
@@ -62,9 +65,6 @@ export class Movie extends Model<Movie, MovieCreationAttrs> {
 
     @Column({type: DataType.INTEGER})
     ageRating: number;
-
-    @Column({type: DataType.BOOLEAN})
-    hasFullHD: number;
 
     @Column({type: DataType.STRING})
     poster: string;

@@ -22,7 +22,7 @@ export class Person extends Model<Person, PersonCreationAttrs> {
     enName: string;
 
     @Column({type: DataType.STRING})
-    photo: number;
+    photo: string;
 
     @BelongsToMany(() => Movie, () => MoviePerson)
     movies: Movie[];

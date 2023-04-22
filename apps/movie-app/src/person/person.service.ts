@@ -1,26 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePersonDto } from './dto/create-person.dto';
-import { UpdatePersonDto } from './dto/update-person.dto';
+import {InjectModel} from "@nestjs/sequelize";
+import {Person} from "./models/person.model";
+import {FindOnePersonDto} from "./dto/findOne-person.dto";
 
 @Injectable()
 export class PersonService {
-  create(createPersonDto: CreatePersonDto) {
-    return 'This action adds a new person';
-  }
+  constructor(@InjectModel(Person) private personRepository: typeof Person) {}
 
   findAll() {
     return `This action returns all person`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} person`;
-  }
-
-  update(id: number, updatePersonDto: UpdatePersonDto) {
-    return `This action updates a #${id} person`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} person`;
+  async findOne(id: number): Promise<FindOnePersonDto> {
+    const person: Person = await this.personRepository.findByPk(id, {include: {all: true}});
+    return new FindOnePersonDto(person);
   }
 }

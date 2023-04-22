@@ -1,6 +1,9 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateMovieDto } from './create-movie.dto';
-
-export class UpdateMovieDto extends PartialType(CreateMovieDto) {
+export class UpdateMovieDto {
   id: number;
+  name: string;
+
+  constructor(id: number, name: string) {
+    this.id = id;
+    this.name = name;
+  }
 }
