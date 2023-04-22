@@ -1,16 +1,16 @@
 import { NestFactory } from '@nestjs/core';
-import { AuthModule } from './auth.module';
+import { UserModule } from './user.module';
 import { SharedService } from '@app/common/rmq/shared.services';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AuthModule);
+  const app = await NestFactory.create(UserModule);
   app.enableCors();
 
   const sharedService = app.get(SharedService);
   app.useGlobalPipes(new ValidationPipe());
-  app.connectMicroservice(sharedService.getRmqOptions('auth_queue'));
+  app.connectMicroservice(sharedService.getRmqOptions('user_queue'));
   app.startAllMicroservices();
-  app.listen(3000).then(() => console.log(`Microservice AUTH is listening`));
+  app.listen(3001).then(() => console.log(`Microservice USER is listening`));
 }
 bootstrap();
