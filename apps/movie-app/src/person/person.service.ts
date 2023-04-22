@@ -24,7 +24,7 @@ export class PersonService {
         });
       return persons.filter((person) => {
           return person.professions.filter((personProfession) => personProfession.name === profession).length;
-      }).map((person) => new FindAllPersonDto(person));
+      }).map((person) => new FindAllPersonDto(person)).slice(0, 10);
   }
 
   async findOne(id: number) {
