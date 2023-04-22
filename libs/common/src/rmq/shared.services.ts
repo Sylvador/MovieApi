@@ -14,8 +14,7 @@ export class SharedService {
     return {
       transport: Transport.RMQ,
       options: {
-        urls: [`amqp://${USER}:${PASSWORD}@${HOST}`],
-        noAck: false,
+        urls: [`amqps://${USER}:${PASSWORD}@${HOST}/${USER}`],
         queue,
         queueOptions: {
           durable: true,
