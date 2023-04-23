@@ -8,5 +8,6 @@ import {Movie} from "./models/movie.model";
   controllers: [MovieController],
   providers: [MovieService],
   imports: [SequelizeModule.forFeature([Movie])],
+  exports: [MovieService]
 })
 export class MovieModule {}

@@ -8,7 +8,7 @@ export class FindAllMovieDto {
     poster: string;
 
     constructor(movie: Movie) {
-        this.id = movie.id;
+        this.id = movie.movieId;
         this.name = movie.name;
         this.enName = movie.enName;
         this.type = movie.type;

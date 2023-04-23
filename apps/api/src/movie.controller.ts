@@ -1,7 +1,8 @@
-import {Body, Controller, Get, Inject, Param, Post} from "@nestjs/common";
+import {Body, Controller, Get, Inject, Param, Post, UseGuards} from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
-import { CreateUserDto } from "apps/user/src/dto/create-user.dto";
 import { catchError, throwError } from "rxjs";
+import {AddCommentDto} from "./dto/add-comment.dto";
+import {AtGuard} from "./guards";
 
 @Controller('movie')
 export class MovieController {
@@ -12,6 +13,20 @@ export class MovieController {
     @Get(':id')
     findOneMovie(@Param('id') id: number) {
         return this.movieClient.send('findOneMovie', id)
+            .pipe(catchError(err => throwError(() => new RpcException(err.response))));
+    }
+
+    @Get()
+    findAllMovies() {
+        return this.movieClient.send('findAllMovies', {})
+            .pipe(catchError(err => throwError(() => new RpcException(err.response))));
+    }
+
+    @Post(':id')
+    @UseGuards(AtGuard)
+    addComment(@Param('id') id: number,
+               @Body() dto: AddCommentDto) {
+        return this.movieClient.send('addComment', {movieId: id, ...dto})
             .pipe(catchError(err => throwError(() => new RpcException(err.response))));
     }
 }
