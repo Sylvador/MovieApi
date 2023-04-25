@@ -30,4 +30,9 @@ export class AuthController {
   ): Promise<Tokens> {
     return this.authService.refresh(userId, refreshToken);
   }
+
+  @MessagePattern('validateUser')
+  validateUser(@Payload() userDto: CreateUserDto): Promise<Tokens> {
+    return this.authService.validateUser(userDto);
+  }
 }

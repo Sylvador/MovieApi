@@ -2,7 +2,6 @@ import { Controller, Get } from '@nestjs/common';
 import { UserService } from './user.service';
 import { MessagePattern, EventPattern, Payload, Ctx } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
-import { SharedService } from '@app/common/rmq/shared.services';
 
 @Controller()
 export class UserController {

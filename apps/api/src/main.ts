@@ -7,7 +7,8 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiModule);
-  
+  app.setGlobalPrefix('api')
+
   const configService = new ConfigService();
   const PORT = configService.get<string>('PORT');
   const config = new DocumentBuilder()

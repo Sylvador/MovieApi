@@ -5,6 +5,8 @@ import { AtStrategy, RtStrategy } from './strategies';
 import { SharedModule } from '@app/common/rmq/shared.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { VkontakteStrategy } from './strategies/vk.strategy';
 
 @Module({
   imports: [
@@ -12,7 +14,8 @@ import { AuthController } from './auth.controller';
     SharedModule.registerRmq('USER_SERVICE', 'user_queue'),
     JwtModule.register({ 
       global: true, 
-      secret: process.env.ACCESS_TOKEN_SECRET_KEY || 'at-secret' }),
+      secret: process.env.ACCESS_TOKEN_SECRET_KEY || 'at-secret'
+    }),
   ],
   controllers: [
     ApiController,
@@ -21,7 +24,9 @@ import { AuthController } from './auth.controller';
   providers: [
     ApiService,
     RtStrategy,
-    AtStrategy
+    AtStrategy,
+    GoogleStrategy,
+    VkontakteStrategy,
   ],
 })
 export class ApiModule {}
