@@ -3,7 +3,7 @@ import { Body, Controller, Get, Inject, Post, UseGuards } from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { CreateUserDto } from "apps/user/src/dto/create-user.dto";
 import { SignInDto } from "apps/user/src/dto/signin.dto";
-import { AtGuard, RtGuard } from "./guards";
+import { AtGuard, GoogleAuthGuard, RtGuard, VKAuthGuard } from "./guards";
 import { Tokens } from "@app/common/types";
 import { Observable, catchError, throwError } from "rxjs";
 
@@ -13,6 +13,26 @@ export class AuthController {
     @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy,
     @Inject('USER_SERVICE') private readonly userClient: ClientProxy,
   ) {}
+
+  @Get('google/login')
+  @UseGuards(GoogleAuthGuard)
+  googleAuth() {}
+
+  @Get('google/redirect')
+  @UseGuards(GoogleAuthGuard)
+  googleAuthRedirect(@GetCurrentUser() tokens: any) {
+    return tokens;
+  }
+
+  @Get('vk/login')
+  @UseGuards(VKAuthGuard)
+  vkAuth() {}
+
+  @Get('vk/redirect')
+  @UseGuards(VKAuthGuard)
+  vkAuthRedirect(@GetCurrentUser() tokens: any) {
+    return tokens;
+  }
 
   @Post('signup')
   signup(@Body() userDto: CreateUserDto) {

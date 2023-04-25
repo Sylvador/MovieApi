@@ -26,7 +26,7 @@ export class SharedModule {
           return ClientProxyFactory.create({
             transport: Transport.RMQ,
             options: {
-              urls: [`amqp://${USER}:${PASSWORD}@${HOST}`],
+              urls: [`amqp://${USER}:${PASSWORD}@${HOST}/${USER}`],
               queue,
               queueOptions: {
                 durable: true

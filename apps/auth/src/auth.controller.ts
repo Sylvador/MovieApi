@@ -10,18 +10,15 @@ import { SharedService } from '@app/common/rmq/shared.services';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly sharedService: SharedService,
     ) {}
 
   @MessagePattern('signup')
   async signup(@Payload() userDto: CreateUserDto, @Ctx() ctx): Promise<Tokens> {
-    this.sharedService.acknowledgeMessage(ctx);
     return this.authService.signup(userDto);
   }
 
   @MessagePattern('signin')
   async signin(@Payload() signInDto: SignInDto, @Ctx() ctx): Promise<Tokens> {
-    this.sharedService.acknowledgeMessage(ctx);
     return this.authService.signin(signInDto);
   }
 
@@ -31,7 +28,11 @@ export class AuthController {
     @Payload('refreshToken') refreshToken: string,
     @Ctx() ctx,
   ): Promise<Tokens> {
-    this.sharedService.acknowledgeMessage(ctx);
     return this.authService.refresh(userId, refreshToken);
+  }
+
+  @MessagePattern('validateUser')
+  validateUser(@Payload() userDto: CreateUserDto): Promise<Tokens> {
+    return this.authService.validateUser(userDto);
   }
 }

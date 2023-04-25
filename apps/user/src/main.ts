@@ -10,7 +10,6 @@ async function bootstrap() {
   const sharedService = app.get(SharedService);
   app.useGlobalPipes(new ValidationPipe());
   app.connectMicroservice(sharedService.getRmqOptions('user_queue'));
-  app.startAllMicroservices();
-  app.listen(3001).then(() => console.log(`Microservice USER is listening`));
+  app.startAllMicroservices().then(() => console.log(`Microservice USER is listening`));
 }
 bootstrap();
