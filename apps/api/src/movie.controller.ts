@@ -23,7 +23,7 @@ export class MovieController {
     }
 
     @Post(':id')
-    @UseGuards(AtGuard)
+    // @UseGuards(AtGuard)
     addComment(@Param('id') id: number,
                @Body() dto: AddCommentDto) {
         return this.movieClient.send('addComment', {movieId: id, ...dto})

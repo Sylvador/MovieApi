@@ -1,10 +1,10 @@
-import {Comment} from "../../comment/models/comment.model";
 import {Movie} from "../models/movie.model";
 import {PersonProfDto} from "./person-prof.dto";
 import {CountryDto} from "./country.dto";
 import {GenreDto} from "./genre.dto";
 import {LanguageDto} from "./language.dto";
 import {FactDto} from "./fact.dto";
+import {CommentDto} from "./comment.dto";
 
 export class FindOneMovieDto {
     movieId: number;
@@ -22,7 +22,7 @@ export class FindOneMovieDto {
     poster: string;
     trailer: string;
     facts: FactDto[];
-    comments: Comment[];
+    comments: CommentDto[];
     // similarMovies: FindAllMovieDto[];
     persons: PersonProfDto[];
     countries: CountryDto[];
@@ -45,7 +45,7 @@ export class FindOneMovieDto {
         this.poster = movie.poster;
         this.trailer = movie.trailer;
         this.facts = movie.facts.map((fact) => new FactDto(fact));
-        this.comments = movie.comments;
+        this.comments = movie.comments.map((comment) => new CommentDto(comment));
         // this.similarMovies = movie.similarMovies.map((simMovie) => new FindAllMovieDto(simMovie));
         this.persons = movie.persons.map((person) => new PersonProfDto(person));
         this.countries = movie.countries.map((country) => new CountryDto(country));

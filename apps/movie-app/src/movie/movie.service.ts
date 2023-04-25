@@ -7,6 +7,11 @@ import {Person} from "../person/models/person.model";
 import {Profession} from "../person/models/profession.model";
 import {FindOneMovieDto} from "./dto/findOne-movie.dto";
 import {RpcException} from "@nestjs/microservices";
+import {Genre} from "./models/genre.model";
+import {Country} from "./models/country.model";
+import {Language} from "./models/language.model";
+import {Fact} from "./models/fact.model";
+import {Comment} from "../comment/models/comment.model";
 
 @Injectable()
 export class MovieService {
@@ -18,7 +23,11 @@ export class MovieService {
   async findOne(id: number) {
     const movie: Movie = await this.movieRepository.findByPk(id, {
       include: [
-        {all: true},
+        {model: Genre},
+        {model: Country},
+        {model: Comment},
+        {model: Language},
+        {model: Fact},
         {model: PersonProfession, include: [{model: Person}, {model: Profession}]},
       ]});
     return new FindOneMovieDto(movie);

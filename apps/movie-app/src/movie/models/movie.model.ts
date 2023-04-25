@@ -8,7 +8,6 @@ import {MovieLanguage} from "./movie-language.model";
 import {Fact} from "./fact.model";
 import {Comment} from "../../comment/models/comment.model";
 import {SimilarMovies} from "./similar-movies.model";
-import {Person} from "../../person/models/person.model";
 import {MoviePerson} from "../../person/models/movie-person.model";
 import {PersonProfession} from "../../person/models/person-profession.model";
 

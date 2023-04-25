@@ -11,9 +11,12 @@ export class CommentService {
               private movieService: MovieService) {}
   async create(dto: AddCommentDto) {
     await this.movieService.getModelById(dto.movieId);
-    const comment = await this.getModelById(dto.parentId);
-    if (+comment.movieId !== +dto.movieId) {
-      throw new RpcException(new BadRequestException('id фильмов родительского и дочернего комментариев не совпадают'));
+    if (dto.parentId) {
+      const comment = await this.getModelById(dto.parentId);
+      if (+comment.movieId !== +dto.movieId) {
+        throw new RpcException(new BadRequestException('id фильмов родительского и дочернего комментариев не совпадают'));
+      }
+
     }
     return this.commentRepository.create(dto, {returning: true});
   }
