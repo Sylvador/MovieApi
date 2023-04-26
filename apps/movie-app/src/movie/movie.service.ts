@@ -15,12 +15,14 @@ import {Comment} from "../comment/models/comment.model";
 
 @Injectable()
 export class MovieService {
-  constructor(@InjectModel(Movie) private movieRepository: typeof Movie) {}
-  findAll() {
+  constructor(@InjectModel(Movie) private movieRepository: typeof Movie,
+              @InjectModel(Genre) private genreRepository: typeof Genre,
+              @InjectModel(Country) private countryRepository: typeof Country) {}
+  async findAllMovie() {
     return `This action returns all movie`;
   }
 
-  async findOne(id: number) {
+  async findOneMovie(id: number) {
     const movie: Movie = await this.movieRepository.findByPk(id, {
       include: [
         {model: Genre},
@@ -33,8 +35,8 @@ export class MovieService {
     return new FindOneMovieDto(movie);
   }
 
-  update(id: number, updateMovieDto: UpdateMovieDto) {
-    return `This action updates a #${id} movie`;
+  async updateMovie(dto: UpdateMovieDto) {
+    return `This action updates a #${dto.id} movie`;
   }
 
   async getModelById(id: number) {
