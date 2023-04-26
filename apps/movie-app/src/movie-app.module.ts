@@ -15,9 +15,13 @@ import { MovieGenre } from "./movie/models/movie-genre.model";
 import { Language } from "./movie/models/language.model";
 import { MovieLanguage } from "./movie/models/movie-language.model";
 import { SimilarMovies } from "./movie/models/similar-movies.model";
+import {SharedModule} from "@app/common/rmq/shared.module";
+import {Profession} from "./person/models/profession.model";
+import {PersonProfession} from "./person/models/person-profession.model";
 
 @Module({
 	imports: [
+		SharedModule,
 		SequelizeModule.forRoot({
 			dialect: 'postgres',
 			host: 'localhost',
@@ -38,6 +42,8 @@ import { SimilarMovies } from "./movie/models/similar-movies.model";
 				Language,
 				MovieLanguage,
 				SimilarMovies,
+				Profession,
+				PersonProfession
 			],
 			autoLoadModels: true,
 		}),

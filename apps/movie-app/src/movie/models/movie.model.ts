@@ -8,8 +8,8 @@ import {MovieLanguage} from "./movie-language.model";
 import {Fact} from "./fact.model";
 import {Comment} from "../../comment/models/comment.model";
 import {SimilarMovies} from "./similar-movies.model";
-import {Person} from "../../person/models/person.model";
 import {MoviePerson} from "../../person/models/movie-person.model";
+import {PersonProfession} from "../../person/models/person-profession.model";
 
 interface MovieCreationAttrs {
     movieId: number;
@@ -78,11 +78,11 @@ export class Movie extends Model<Movie, MovieCreationAttrs> {
     @HasMany(() => Comment)
     comments: Comment[];
 
-    @BelongsToMany(() => Movie, () => SimilarMovies)
-    similarMovies: Movie[];
+    @HasMany(() => SimilarMovies)
+    similarMovies: SimilarMovies[];
 
-    @BelongsToMany(() => Person, () => MoviePerson)
-    persons: Person[];
+    @BelongsToMany(() => PersonProfession, () => MoviePerson)
+    persons: PersonProfession[];
 
     @BelongsToMany(() => Country, () => MovieCountry)
     countries: Country[];

@@ -7,7 +7,7 @@ export class FindAllPersonDto {
     photo: string;
 
     constructor(person: Person) {
-        this.id = person.id;
+        this.id = person.personId;
         this.name = person.name;
         this.enName = person.enName;
         this.photo = person.photo;

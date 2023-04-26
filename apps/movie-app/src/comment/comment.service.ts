@@ -1,26 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import {BadRequestException, Injectable} from '@nestjs/common';
+import { AddCommentDto } from './dto/add-comment.dto';
+import {InjectModel} from "@nestjs/sequelize";
+import {Comment} from "./models/comment.model";
+import {MovieService} from "../movie/movie.service";
+import {RpcException} from "@nestjs/microservices";
 
 @Injectable()
 export class CommentService {
-  create(createCommentDto: CreateCommentDto) {
-    return 'This action adds a new comment';
+  constructor(@InjectModel(Comment) private commentRepository: typeof Comment,
+              private movieService: MovieService) {}
+  async create(dto: AddCommentDto) {
+    await this.movieService.getModelById(dto.movieId);
+    if (dto.parentId) {
+      const comment = await this.getModelById(dto.parentId);
+      if (+comment.movieId !== +dto.movieId) {
+        throw new RpcException(new BadRequestException('id фильмов родительского и дочернего комментариев не совпадают'));
+      }
+
+    }
+    return this.commentRepository.create(dto, {returning: true});
   }
 
-  findAll() {
-    return `This action returns all comment`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
-  }
-
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  async getModelById(id: number) {
+    const comment = await this.commentRepository.findByPk(id);
+    if (!comment) {
+      throw new RpcException(new BadRequestException('Комментарий с данным id не найден'));
+    }
+    return comment;
   }
 }

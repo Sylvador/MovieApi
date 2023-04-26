@@ -1,11 +1,10 @@
-import {Fact} from "../models/fact.model";
-import {Comment} from "../../comment/models/comment.model";
 import {Movie} from "../models/movie.model";
-import {Person} from "../../person/models/person.model";
-import {Country} from "../models/country.model";
-import {Genre} from "../models/genre.model";
-import {Language} from "../models/language.model";
-import {FindAllMovieDto} from "./findAll-movie.dto";
+import {PersonProfDto} from "./person-prof.dto";
+import {CountryDto} from "./country.dto";
+import {GenreDto} from "./genre.dto";
+import {LanguageDto} from "./language.dto";
+import {FactDto} from "./fact.dto";
+import {CommentDto} from "./comment.dto";
 
 export class FindOneMovieDto {
     movieId: number;
@@ -22,13 +21,13 @@ export class FindOneMovieDto {
     ageRating: number;
     poster: string;
     trailer: string;
-    facts: Fact[];
-    comments: Comment[];
-    similarMovies: FindAllMovieDto[];
-    persons: Person[];
-    countries: Country[];
-    genres: Genre[];
-    languages: Language[];
+    facts: FactDto[];
+    comments: CommentDto[];
+    // similarMovies: FindAllMovieDto[];
+    persons: PersonProfDto[];
+    countries: CountryDto[];
+    genres: GenreDto[];
+    languages: LanguageDto[];
 
     constructor(movie: Movie) {
         this.movieId = movie.movieId;
@@ -45,12 +44,12 @@ export class FindOneMovieDto {
         this.ageRating = movie.ageRating;
         this.poster = movie.poster;
         this.trailer = movie.trailer;
-        this.facts = movie.facts;
-        this.comments = movie.comments;
-        this.similarMovies = movie.similarMovies.map((simMovie) => new FindAllMovieDto(simMovie));
-        this.persons = movie.persons;
-        this.countries = movie.countries;
-        this.genres = movie.genres;
-        this.languages = movie.languages;
+        this.facts = movie.facts.map((fact) => new FactDto(fact));
+        this.comments = movie.comments.map((comment) => new CommentDto(comment));
+        // this.similarMovies = movie.similarMovies.map((simMovie) => new FindAllMovieDto(simMovie));
+        this.persons = movie.persons.map((person) => new PersonProfDto(person));
+        this.countries = movie.countries.map((country) => new CountryDto(country));
+        this.genres = movie.genres.map((genre) => new GenreDto(genre));
+        this.languages = movie.languages.map((language) => new LanguageDto(language));
     }
 }

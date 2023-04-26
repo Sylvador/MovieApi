@@ -2,24 +2,23 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { MovieService } from './movie.service';
 import { UpdateMovieDto } from './dto/update-movie.dto';
-import {FindOneMovieDto} from "./dto/findOne-movie.dto";
 
 @Controller()
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
   @MessagePattern('findAllMovie')
-  findAll() {
-    return this.movieService.findAll();
+  findAllMovie() {
+    return this.movieService.findAllMovie();
   }
 
   @MessagePattern('findOneMovie')
-  findOne(@Payload() id: number): Promise<FindOneMovieDto> {
-    return this.movieService.findOne(id);
+  findOneMovie(@Payload() id: number) {
+    return this.movieService.findOneMovie(id);
   }
 
   @MessagePattern('updateMovie')
-  update(@Payload() updateMovieDto: UpdateMovieDto) {
-    return this.movieService.update(updateMovieDto.id, updateMovieDto);
+  updateMovie(@Payload() dto: UpdateMovieDto) {
+    return this.movieService.updateMovie(dto);
   }
 }

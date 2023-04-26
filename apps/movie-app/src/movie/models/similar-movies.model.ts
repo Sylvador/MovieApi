@@ -1,4 +1,4 @@
-import {Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
+import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
 import {Movie} from "./movie.model";
 
 @Table({tableName: 'similar_movies', createdAt: false, updatedAt: false})
@@ -9,8 +9,12 @@ export class SimilarMovies extends Model<SimilarMovies> {
     @ForeignKey(() => Movie)
     @Column({type: DataType.INTEGER, allowNull: false, unique: false, onDelete: 'CASCADE'})
     movieId1: number;
+    @BelongsTo(() => Movie)
+    movie1: Movie
 
     @ForeignKey(() => Movie)
     @Column({type: DataType.INTEGER, allowNull: false, unique: false, onDelete: 'CASCADE'})
     movieId2: number;
+    @BelongsTo(() => Movie)
+    movie2: Movie
 }

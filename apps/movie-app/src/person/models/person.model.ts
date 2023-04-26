@@ -1,6 +1,8 @@
 import {BelongsToMany, Column, DataType, HasMany, Model, Table} from "sequelize-typescript";
 import {Movie} from "../../movie/models/movie.model";
 import {MoviePerson} from "./movie-person.model";
+import {PersonProfession} from "./person-profession.model";
+import {Profession} from "./profession.model";
 
 interface PersonCreationAttrs {
     personId: number;
@@ -24,6 +26,6 @@ export class Person extends Model<Person, PersonCreationAttrs> {
     @Column({type: DataType.STRING})
     photo: string;
 
-    @BelongsToMany(() => Movie, () => MoviePerson)
-    movies: Movie[];
+    @BelongsToMany(() => Profession, () => PersonProfession)
+    professions: Profession[];
 }
