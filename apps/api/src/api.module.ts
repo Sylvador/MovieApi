@@ -12,7 +12,8 @@ import {MovieController} from "./movie.controller";
   imports: [
     SharedModule.registerRmq('AUTH_SERVICE', 'auth_queue'),
     SharedModule.registerRmq('USER_SERVICE', 'user_queue'),
-    JwtModule.register({ 
+    SharedModule.registerRmq('MOVIE_SERVICE', 'movie_queue'),
+    JwtModule.register({
       global: true, 
       secret: process.env.ACCESS_TOKEN_SECRET_KEY || 'at-secret' }),
   ],

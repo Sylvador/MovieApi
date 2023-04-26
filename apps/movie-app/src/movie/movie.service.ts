@@ -12,6 +12,7 @@ import {Country} from "./models/country.model";
 import {Language} from "./models/language.model";
 import {Fact} from "./models/fact.model";
 import {Comment} from "../comment/models/comment.model";
+import {SimilarMovies} from "./models/similar-movies.model";
 
 @Injectable()
 export class MovieService {
@@ -25,14 +26,17 @@ export class MovieService {
   async findOneMovie(id: number) {
     const movie: Movie = await this.movieRepository.findByPk(id, {
       include: [
-        {model: Genre},
-        {model: Country},
-        {model: Comment},
-        {model: Language},
-        {model: Fact},
-        {model: PersonProfession, include: [{model: Person}, {model: Profession}]},
+        {model: Genre, through: {attributes: []}},
+        {model: Country, through: {attributes: []}},
+        {model: Comment, attributes: {exclude: ['movieId']}},
+        {model: Language, through: {attributes: []}},
+        {model: Fact, attributes: {exclude: ['movieId']}},
+        {model: SimilarMovies}
+        // {model: PersonProfession, include: [{model: Person}, {model: Profession}]},
       ]});
-    return new FindOneMovieDto(movie);
+    const persons = await movie.$get('persons', {include: [{model: Person}, {model: Profession}]});
+    movie.setDataValue('persons', persons);
+    return movie;
   }
 
   async updateMovie(dto: UpdateMovieDto) {
