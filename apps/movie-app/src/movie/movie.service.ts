@@ -22,8 +22,25 @@ export class MovieService {
     @InjectModel(Genre) private genreRepository: typeof Genre,
     @InjectModel(Country) private countryRepository: typeof Country
   ) { }
-  async findAllMovie() {
-    return `This action returns all movie`;
+
+  async findAllMovie(page: number): Promise<Movie[]> { 
+    const movies: Movie[] = await this.movieRepository.findAll({
+      include: [
+        { model: Genre, through: { attributes: [] } },
+        { model: Country, through: { attributes: [] } },
+        { model: Comment, attributes: { exclude: ['movieId'] } },
+        { model: Language, through: { attributes: [] } },
+        { model: Fact, attributes: { exclude: ['movieId'] } },
+        { model: SimilarMovies },
+      ],
+      limit: 10,
+      offset: (page - 1) * 10,
+    });
+    for (let i = 0; i < movies.length; i++) {
+      const persons = await movies[i].$get('persons', { include: [{ model: Person }, { model: Profession }] });
+      movies[i].setDataValue('persons', persons);
+    }
+    return movies;
   }
 
   async findOneMovie(id: number): Promise<Movie> {
@@ -34,7 +51,7 @@ export class MovieService {
         { model: Comment, attributes: { exclude: ['movieId'] } },
         { model: Language, through: { attributes: [] } },
         { model: Fact, attributes: { exclude: ['movieId'] } },
-        { model: SimilarMovies }
+        { model: SimilarMovies },
       ]
     });
     const persons = await movie.$get('persons', { include: [{ model: Person }, { model: Profession }] });

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { catchError, throwError } from "rxjs";
 import { AddCommentDto } from "./dto/add-comment.dto";
@@ -17,8 +17,8 @@ export class MovieController {
   }
 
   @Get()
-  findAllMovies() {
-    return this.movieClient.send('findAllMovies', {})
+  findAllMovies(@Query('page') page: number) {
+    return this.movieClient.send('findAllMovies', page)
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
 
