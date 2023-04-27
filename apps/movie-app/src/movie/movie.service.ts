@@ -13,6 +13,7 @@ import { Language } from "./models/language.model";
 import { Fact } from "./models/fact.model";
 import { Comment } from "../comment/models/comment.model";
 import { SimilarMovies } from "./models/similar-movies.model";
+import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
 
 @Injectable()
 export class MovieService {
@@ -41,9 +42,14 @@ export class MovieService {
     return movie;
   }
 
-  async updateMovie(dto: UpdateMovieDto) {
-    return `This action updates a #${dto.id} movie`;
+  updateMovie(dto: UpdateMovieDto): void {
+    this.movieRepository.update(dto, { where: { id: dto.id } });
   }
+  
+  updateGenre(dto: UpdateGenreDto): void {
+    this.genreRepository.update(dto, { where: { id: dto.id } });
+  }
+  
 
   async getModelById(id: number) {
     const movie = this.movieRepository.findByPk(id);

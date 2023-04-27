@@ -1,7 +1,8 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { MovieService } from './movie.service';
 import { UpdateMovieDto } from './dto/update-movie.dto';
+import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
 
 @Controller()
 export class MovieController {
@@ -17,8 +18,13 @@ export class MovieController {
     return this.movieService.findOneMovie(id);
   }
 
-  @MessagePattern('updateMovie')
-  updateMovie(@Payload() dto: UpdateMovieDto) {
-    return this.movieService.updateMovie(dto);
+  @EventPattern('updateMovie')
+  updateMovie(@Payload() dto: UpdateMovieDto): void {
+    this.movieService.updateMovie(dto);
+  }
+
+  @EventPattern('updateGenre')
+  updateGenre(@Payload() dto: UpdateGenreDto): void {
+    this.movieService.updateGenre(dto);
   }
 }
