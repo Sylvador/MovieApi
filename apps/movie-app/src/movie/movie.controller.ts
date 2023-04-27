@@ -3,14 +3,15 @@ import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { MovieService } from './movie.service';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
+import { FindAllMovieDto } from './dto/findAll-movie.dto';
 
 @Controller()
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
   @MessagePattern('findAllMovie')
-  findAllMovie(@Payload() page: number) {
-    return this.movieService.findAllMovie(page);
+  findAllMovie(@Payload('page') page: number, @Payload('filters') filters: FindAllMovieDto) {
+    return this.movieService.findAllMovie(page, filters);
   }
 
   @MessagePattern('findOneMovie')

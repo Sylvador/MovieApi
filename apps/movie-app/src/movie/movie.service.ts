@@ -14,6 +14,7 @@ import { Fact } from "./models/fact.model";
 import { Comment } from "../comment/models/comment.model";
 import { SimilarMovies } from "./models/similar-movies.model";
 import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
+import { FindAllMovieDto } from './dto/findAll-movie.dto';
 
 @Injectable()
 export class MovieService {
@@ -23,8 +24,9 @@ export class MovieService {
     @InjectModel(Country) private countryRepository: typeof Country
   ) { }
 
-  async findAllMovie(page: number): Promise<Movie[]> { 
+  async findAllMovie(page: number, filters: FindAllMovieDto): Promise<Movie[]> { 
     const movies: Movie[] = await this.movieRepository.findAll({
+      where: { ...filters },
       include: [
         { model: Genre, through: { attributes: [] } },
         { model: Country, through: { attributes: [] } },

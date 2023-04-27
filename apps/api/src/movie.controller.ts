@@ -3,6 +3,7 @@ import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { catchError, throwError } from "rxjs";
 import { AddCommentDto } from "./dto/add-comment.dto";
 import { UpdateMovieDto } from "./dto/update-movie.dto";
+import { FindAllMovieDto } from "apps/movie-app/src/movie/dto/findAll-movie.dto";
 
 @Controller('movie')
 export class MovieController {
@@ -17,8 +18,8 @@ export class MovieController {
   }
 
   @Get()
-  findAllMovies(@Query('page') page: number) {
-    return this.movieClient.send('findAllMovies', page)
+  findAllMovies(@Query('page') page: number, @Body('filters') filters: FindAllMovieDto) {
+    return this.movieClient.send('findAllMovies', { page, filters })
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
 
