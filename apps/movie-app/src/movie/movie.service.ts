@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { InjectModel } from "@nestjs/sequelize";
 import { Movie } from "./models/movie.model";
@@ -56,6 +56,9 @@ export class MovieService {
         { model: SimilarMovies },
       ]
     });
+    if (!movie) {
+      throw new RpcException(new NotFoundException('Фильм с данным id не найден'));
+    }
     const persons = await movie.$get('persons', { include: [{ model: Person }, { model: Profession }] });
     movie.setDataValue('persons', persons);
     return movie;
@@ -73,7 +76,7 @@ export class MovieService {
   async getModelById(id: number) {
     const movie = this.movieRepository.findByPk(id);
     if (!movie) {
-      throw new RpcException(new BadRequestException('Фильм с данным id не найден'));
+      throw new RpcException(new NotFoundException('Фильм с данным id не найден'));
     }
     return movie;
   }
