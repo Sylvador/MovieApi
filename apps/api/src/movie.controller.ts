@@ -3,9 +3,9 @@ import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { catchError, throwError } from "rxjs";
 import { AddCommentDto } from "./dto/add-comment.dto";
 import { UpdateMovieDto } from "./dto/update-movie.dto";
-import { FindAllMovieDto } from "apps/movie-app/src/movie/dto/findAll-movie.dto";
+import { FindAllMovieDto } from "../../movie-app/src/movie/dto/findAll-movie.dto";
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Movie } from "apps/movie-app/src/movie/models/movie.model";
+import { Movie } from "../../movie-app/src/movie/models/movie.model";
 
 @ApiTags('Фильмы')
 @Controller('movie')

@@ -1,9 +1,8 @@
 import { Body, Controller, Get, Inject, Param, Post, Query } from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
-import { CreateUserDto } from "apps/user/src/dto/create-user.dto";
 import { catchError, throwError } from "rxjs";
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Person } from "apps/movie-app/src/person/models/person.model";
+import { Person } from "../../movie-app/src/person/models/person.model";
 
 @ApiTags('Персоны')
 @Controller('person')

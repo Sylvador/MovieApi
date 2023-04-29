@@ -1,11 +1,11 @@
-import { GetCurrentUser, GetCurrentUserId } from "@app/common/decorators";
-import { Body, Controller, Get, Inject, Post, UseGuards } from "@nestjs/common";
+import { GetCurrentUser, GetCurrentUserId } from "../../../libs/common/src/decorators";
+import { Body, Controller, Get, HttpCode, Inject, Post, UseGuards } from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
-import { Tokens } from "@app/common/types";
+import { Tokens } from "../../../libs/common/src/types";
 import { Observable, catchError, throwError } from "rxjs";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { CreateUserDto } from "apps/user/src/dto/create-user.dto";
-import { SignInDto } from "apps/user/src/dto/signin.dto";
+import { CreateUserDto } from "../../user/src/dto/create-user.dto";
+import { SignInDto } from "../../user/src/dto/signin.dto";
 import { AtGuard, GoogleAuthGuard, RtGuard, VKAuthGuard } from "./guards";
 
 @ApiTags('Авторизация')
@@ -54,6 +54,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Авторизация', description: 'Авторизует пользователя' })
   @ApiResponse({ status: 200, description: 'Токены доступа' })
   @ApiResponse({ status: 403, description: 'Ошибка аутентификации' })
+  @HttpCode(200)
   @Post('signin')
   signin(@Body() signInDto: SignInDto) {
     return this.authClient.send('signin', signInDto)

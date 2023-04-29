@@ -1,11 +1,11 @@
 import {Movie} from "../models/movie.model";
 
 export class FindAllMovieDto {
-    id: number
-    name: string;
-    enName: string;
-    type: string;
-    poster: string;
+    id?: number;
+    name?: string;
+    enName?: string;
+    type?: string;
+    poster?: string;
 
     constructor(movie: Movie) {
         this.id = movie.movieId;
