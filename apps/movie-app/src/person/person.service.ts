@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {InjectModel} from "@nestjs/sequelize";
 import {Person} from "./models/person.model";
-import {FindOnePersonDto} from "./dto/findOne-person.dto";
 import {Op} from "sequelize";
-import {FindAllPersonDto} from "./dto/findAll-person.dto";
 import {PersonProfession} from "./models/person-profession.model";
 import {Profession} from "./models/profession.model";
 
