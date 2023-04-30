@@ -15,7 +15,6 @@ async function bootstrap() {
     .setTitle('Movie API')
     .setDescription('Movie API description')
     .setVersion('1.0')
-    .addTag('API')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

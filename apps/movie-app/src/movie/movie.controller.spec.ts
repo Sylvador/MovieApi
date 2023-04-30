@@ -1,20 +1,79 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MovieController } from './movie.controller';
 import { MovieService } from './movie.service';
+import { FindAllMovieDto } from './dto/findAll-movie.dto';
+import { UpdateMovieDto } from './dto/update-movie.dto';
+import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
+import * as SequelizeMock from 'sequelize-mock'
+import { of } from 'rxjs';
+
+const mockMovieService = () => ({
+  findAllMovie: jest.fn(),
+  findOneMovie: jest.fn(),
+  updateMovie: jest.fn(),
+  updateGenre: jest.fn(),
+});
 
 describe('MovieController', () => {
   let controller: MovieController;
+  let service: ReturnType<typeof mockMovieService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [MovieController],
-      providers: [MovieService],
+      providers: [
+        {
+          provide: MovieService,
+          useFactory: mockMovieService,
+        }
+      ],
     }).compile();
 
     controller = module.get<MovieController>(MovieController);
+    service = module.get(MovieService);
+  });
+  describe('findAllMovie', () => {
+    it('should return an array of movies', async () => {
+      const filters: FindAllMovieDto = { name: 'test' };
+      const DBConnectionMock = new SequelizeMock();
+      const result = DBConnectionMock.define('movies', {
+        'name': 'Test Movie',
+      });
+      jest.spyOn(service, 'findAllMovie').mockResolvedValueOnce(result);
+
+      expect(await controller.findAllMovie(1, filters)).toBe(result);
+    });
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  describe('findOneMovie', () => {
+    it('should return a movie', async () => {
+      const DBConnectionMock = new SequelizeMock();
+      const result = DBConnectionMock.define('movies', {
+        'name': 'Test Movie',
+      });
+      jest.spyOn(service, 'findOneMovie').mockResolvedValueOnce(result);
+
+      expect(await controller.findOneMovie(1)).toBe(result);
+    });
+  });
+
+  describe('updateMovie', () => {
+    it('should update a movie', async () => {
+      const dto: UpdateMovieDto = { id: 1, name: 'Updated Movie' };
+      jest.spyOn(service, 'updateMovie').mockImplementation(() => of(null));
+
+      expect(await controller.updateMovie(dto)).toBeUndefined();
+      expect(service.updateMovie).toHaveBeenCalledWith(dto);
+    });
+  });
+
+  describe('updateGenre', () => {
+    it('should update a genre', async () => {
+      const dto: UpdateGenreDto = { id: 1, name: 'Updated Genre' };
+      jest.spyOn(service, 'updateGenre').mockImplementation(() => of(null));
+
+      expect(await controller.updateGenre(dto)).toBeUndefined();
+      expect(service.updateGenre).toHaveBeenCalledWith(dto);
+    });
   });
 });
