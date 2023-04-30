@@ -1,0 +1,68 @@
+version: '3'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+      target: development
+    env_file:
+      - .development.env
+
+    ports:
+      - ${PORT}:${PORT}
+
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+    command: npm run start:dev api
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    env_file:
+      - .development.env
+
+    depends_on:
+      - api
+
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run start:dev auth
+
+  user:
+    build:
+      context: .
+      dockerfile: ./apps/user/Dockerfile
+      target: development
+    
+    env_file:
+      - .development.env
+    
+    depends_on:
+      - api
+
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  movie-app:
+    build:
+      context: .
+      dockerfile: ./apps/movie-app/Dockerfile
+      target: development
+
+    env_file:
+      - .development.env
+
+    depends_on:
+      - api
+
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+    command: npm run start:dev movie-app
