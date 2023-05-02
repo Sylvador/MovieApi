@@ -68,7 +68,7 @@ describe('MovieService', () => {
       const filters: FindAllMovieDto = { name: 'test' };
       jest.spyOn(movieRepository, 'findAll').mockResolvedValueOnce(movieMock);
 
-      expect(await service.findAllMovie(1, filters)).toBe(movieMock);
+      expect(await service.findAllMovie(filters)).toBe(movieMock);
       expect(movieRepository.findAll).toHaveBeenCalledWith({
         where: { ...filters },
         include: [

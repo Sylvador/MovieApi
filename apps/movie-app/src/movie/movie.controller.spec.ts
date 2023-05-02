@@ -41,7 +41,7 @@ describe('MovieController', () => {
       });
       jest.spyOn(service, 'findAllMovie').mockResolvedValueOnce(result);
 
-      expect(await controller.findAllMovie(1, filters)).toBe(result);
+      expect(await controller.findAllMovie(filters)).toBe(result);
     });
   });
 

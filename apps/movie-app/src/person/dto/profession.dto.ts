@@ -5,11 +5,4 @@ export class ProfessionDto {
     id: number;
     name: string;
     movies: FindAllMovieDto[]
-
-
-    constructor(personProfession: PersonProfession) {
-        this.id = personProfession.professionId;
-        this.name = personProfession.profession.name;
-        this.movies = personProfession.movies.map((movie) => new FindAllMovieDto(movie));
-    }
 }

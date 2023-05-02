@@ -15,6 +15,9 @@ import { Comment } from "../comment/models/comment.model";
 import { SimilarMovies } from "./models/similar-movies.model";
 import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
 import { FindAllMovieDto } from './dto/findAll-movie.dto';
+import { Op, Sequelize, WhereOptions } from 'sequelize';
+import { MovieGenre } from './models/movie-genre.model';
+import { AssociationGetOptions } from 'sequelize-typescript';
 
 @Injectable()
 export class MovieService {
@@ -24,25 +27,126 @@ export class MovieService {
     @InjectModel(Country) private countryRepository: typeof Country
   ) { }
 
-  async findAllMovie(page: number, filters: FindAllMovieDto): Promise<Movie[]> { 
-    const movies: Movie[] = await this.movieRepository.findAll({
-      where: { ...filters },
-      include: [
-        { model: Genre, through: { attributes: [] } },
-        { model: Country, through: { attributes: [] } },
-        { model: Comment, attributes: { exclude: ['movieId'] } },
-        { model: Language, through: { attributes: [] } },
-        { model: Fact, attributes: { exclude: ['movieId'] } },
-        { model: SimilarMovies },
-      ],
-      limit: 10,
-      offset: (page - 1) * 10,
-    });
-    for (let i = 0; i < movies.length; i++) {
-      const persons = await movies[i].$get('persons', { include: [{ model: Person }, { model: Profession }] });
-      movies[i].setDataValue('persons', persons);
+  async findAllMovie(filters: FindAllMovieDto): Promise<Movie[]> {
+    try {
+      const { genres, countries, persons, page, rating, search } = filters;
+      console.log('before query ***********')
+      const movies: Movie[] = await this.movieRepository.findAll({
+        attributes: [
+          'movieId',
+          'name',
+          'enName',
+          'type',
+          'rating',
+          'votes',
+          'movieLength',
+          'description',
+          'premiere',
+          'slogan',
+          'shortDescription',
+          'ageRating',
+          'poster',
+          'trailer',
+        ],
+        include: [
+          {
+            model: Genre, as: 'genres', attributes: [], through: { attributes: [] },
+            // where: {
+            //   name: {
+            //     [Op.in]: ['триллер', 'ужасы'],
+            //   },
+            // }
+            // where: { 
+            //   ...(genres?.length ? {
+            //     name: {
+            //       [Op.in]: genres
+            //     }
+            //   } : {})
+            // }
+          },
+          // { model: Country, through: { attributes: [] } },
+          // { model: Comment, attributes: { exclude: ['movieId'] } },
+        ],
+        where: {
+          ...(search ? {
+            [Op.or]: [
+              { name: { [Op.iLike]: `%${search}%` } },
+              { enName: { [Op.iLike]: `%${search}%` } },
+            ]
+          } : {}),
+          ...(genres?.length ? {
+            '$genres.name$': {
+              [Op.in]: genres,
+            },
+          } : {}),
+          ...(countries?.length ? {
+            '$countries.name$': {
+              [Op.in]: countries,
+            },
+          } : {}),
+          ...(rating ? {
+            rating: {
+              [Op.gte]: rating,
+            }
+          } : {}),
+        },
+        group: ['Movie.movieId'],
+        // having: Sequelize.where(Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('genres.name'))), '>=', genres.length),
+        having: {
+          ...(genres?.length ? {
+            // count of genres
+            [Op.and]: Sequelize.literal(`COUNT(DISTINCT CASE WHEN "genres"."name" IN (${genres.map(g => `'${g}'`).join(',')}) THEN "genres"."genreId" END) >= ${genres.length}`),
+            // [Op.and]: Sequelize.where(Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('genres.name'))), '=', genres.length),
+            // [Op.and]: {
+            //   '$genres.name$': {
+            //     [Op.in]: genres,
+            //   },
+            // },
+          } : {}),
+          // ...(countries?.length ? {
+          //   [Op.and]: Sequelize.literal(`COUNT(DISTINCT CASE WHEN '$countries.name$' IN (${countries.map(c => `'${c}'`).join(',')}) THEN '$countries.name$' END) = ${countries.length}`),
+          // } : {}),
+          // },
+          // having: Sequelize.where(
+          //   Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.fn('CASE', {
+          //     when: {
+          //       [Op.or]: [
+          //         { 'genre.name': 'триллер' },
+          //         { 'genre.name': 'ужасы' },
+          //       ],
+          //     },
+          //     then: Sequelize.col('genres.name'),
+          //   }))),
+          //   2
+          // ),
+        },
+        subQuery: false,
+        limit: 10,
+        offset: ((page || 1) - 1) * 10,
+      });
+      console.log('after query')
+      
+      for (let i = 0; i < movies.length; i++) {
+        const persons = await movies[i].$get('persons', { include: [{ model: Person }, { model: Profession }] });
+        movies[i].setDataValue('persons', persons);
+      }
+      
+      
+      for (let i = 0; i < movies.length; i++) {
+        const genres = await movies[i].$get('genres', {
+          joinTableAttributes: [],
+          attributes: ['genreId', 'name'],
+        } as any);
+
+        movies[i].setDataValue('genres', genres as any);
+      }
+      
+      
+      return movies;
+    } catch (error) {
+      console.log(error);
+      throw new RpcException(new BadRequestException(error.message));
     }
-    return movies;
   }
 
   async findOneMovie(id: number): Promise<Movie> {
@@ -67,11 +171,11 @@ export class MovieService {
   updateMovie(dto: UpdateMovieDto): void {
     this.movieRepository.update(dto, { where: { id: dto.id } });
   }
-  
+
   updateGenre(dto: UpdateGenreDto): void {
     this.genreRepository.update(dto, { where: { id: dto.id } });
   }
-  
+
 
   async getModelById(id: number) {
     const movie = this.movieRepository.findByPk(id);

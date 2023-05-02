@@ -10,8 +10,8 @@ export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
   @MessagePattern('findAllMovie')
-  findAllMovie(@Payload('page') page: number, @Payload('filters') filters: FindAllMovieDto) {
-    return this.movieService.findAllMovie(page, filters);
+  findAllMovie(@Payload('filters') filters: FindAllMovieDto) {
+    return this.movieService.findAllMovie(filters);
   }
 
   @MessagePattern('findOneMovie')

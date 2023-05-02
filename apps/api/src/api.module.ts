@@ -13,7 +13,7 @@ import { ConfigModule } from '@nestjs/config';
   imports: [
     SharedModule.registerRmq('AUTH_SERVICE', 'auth_queue'),
     SharedModule.registerRmq('USER_SERVICE', 'user_queue'),
-    SharedModule.registerRmq('MOVIE_SERVICE', 'movie_queue'),
+    SharedModule.registerRmq('MOVIE_SERVICE', 'movie_queue_leha'),
     JwtModule.register({
       global: true,
       secret: process.env.ACCESS_TOKEN_SECRET_KEY || 'at-secret'

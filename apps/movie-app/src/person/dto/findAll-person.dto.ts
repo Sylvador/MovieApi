@@ -5,11 +5,4 @@ export class FindAllPersonDto {
     name: string;
     enName: string;
     photo: string;
-
-    constructor(person: Person) {
-        this.id = person.personId;
-        this.name = person.name;
-        this.enName = person.enName;
-        this.photo = person.photo;
-    }
 }

@@ -9,7 +9,7 @@ async function bootstrap() {
 
   const sharedService = app.get(SharedService);
   app.useGlobalPipes(new ValidationPipe());
-  app.connectMicroservice(sharedService.getRmqOptions('movie_queue'));
+  app.connectMicroservice(sharedService.getRmqOptions('movie_queue_leha'));
   app.startAllMicroservices();
 }
 bootstrap();

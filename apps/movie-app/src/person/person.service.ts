@@ -32,6 +32,6 @@ export class PersonService {
       where: { personId: id },
       include: { all: true }
     });
-    return new FindOnePersonDto(personProfessions);
+    return personProfessions;
   }
 }

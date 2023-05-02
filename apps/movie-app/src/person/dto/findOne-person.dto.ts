@@ -9,12 +9,4 @@ export class FindOnePersonDto {
     enName: string;
     photo: string;
     professions: ProfessionDto[]
-
-    constructor(personProfessions: PersonProfession[]) {
-        this.id = personProfessions[0].personId;
-        this.name = personProfessions[0].person.name;
-        this.enName = personProfessions[0].person.enName;
-        this.photo = personProfessions[0].person.photo;
-        this.professions = personProfessions.map((personProfession) => new ProfessionDto(personProfession))
-    }
 }

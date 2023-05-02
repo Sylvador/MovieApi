@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Inject, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Inject, Param, ParseArrayPipe, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { catchError, throwError } from "rxjs";
 import { AddCommentDto } from "./dto/add-comment.dto";
@@ -30,10 +30,13 @@ export class MovieController {
   @ApiQuery({ name: 'search', description: 'Строка поиска', required: false })
   @ApiBody({ type: FindAllMovieDto })
   @Get()
-  findAllMovies(@Query('page') page: number, @Query('search') search: string, @Body('filters') filters: FindAllMovieDto) {
-    filters.enName = search;
-    filters.name = search;
-    return this.movieClient.send('findAllMovies', { page, filters })
+  async findAllMovies(
+    @Query() filters: FindAllMovieDto,
+  ) {
+    filters.genres = await new ParseArrayPipe({ items: String, separator: ' ', optional: true }).transform(filters.genres, { type: 'query', data: 'genres', metatype: String });
+    filters.countries = await new ParseArrayPipe({ items: String, separator: ' ', optional: true }).transform(filters.countries, { type: 'query', data: 'countries', metatype: String });
+    filters.persons = await new ParseArrayPipe({ items: String, separator: ' ', optional: true }).transform(filters.persons, { type: 'query', data: 'persons', metatype: String });
+    return this.movieClient.send('findAllMovie', { filters })
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
 
