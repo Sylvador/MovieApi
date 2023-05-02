@@ -53,4 +53,22 @@ export class MovieController {
     return this.movieClient.send('addComment', { movieId: id, ...dto })
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
+
+  
+  @ApiOperation({ summary: 'Получить все жанры', description: 'Возвращает все жанры' })
+  @ApiResponse({ status: 200, description: 'Жанры получены', type: [String] })
+  @Get('genre')
+  getAllGenres() {
+    return this.movieClient.send('getAllGenres', {})
+      .pipe(catchError(err => throwError(() => new RpcException(err.response))));
+  }
+
+  @ApiOperation({ summary: 'Получить все страны', description: 'Возвращает все страны' })
+  @ApiResponse({ status: 200, description: 'Страны получены', type: [String] })
+  @Get('country')
+  getAllCountries() {
+    return this.movieClient.send('getAllCountries', {})
+      .pipe(catchError(err => throwError(() => new RpcException(err.response))));
+  }
 }
+
