@@ -1,11 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { UpdateMovieDto } from './dto/update-movie.dto';
 import { InjectModel } from "@nestjs/sequelize";
 import { Movie } from "./models/movie.model";
-import { PersonProfession } from "../person/models/person-profession.model";
 import { Person } from "../person/models/person.model";
 import { Profession } from "../person/models/profession.model";
-import { FindOneMovieDto } from "./dto/findOne-movie.dto";
 import { RpcException } from "@nestjs/microservices";
 import { Genre } from "./models/genre.model";
 import { Country } from "./models/country.model";
@@ -15,9 +12,8 @@ import { Comment } from "../comment/models/comment.model";
 import { SimilarMovies } from "./models/similar-movies.model";
 import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
 import { FindAllMovieDto } from './dto/findAll-movie.dto';
-import { Op, Sequelize, WhereOptions } from 'sequelize';
-import { MovieGenre } from './models/movie-genre.model';
-import { AssociationGetOptions } from 'sequelize-typescript';
+import { Op, Sequelize } from 'sequelize';
+import { UpdateMovieDto } from 'apps/api/src/dto/update-movie.dto';
 
 @Injectable()
 export class MovieService {
@@ -49,23 +45,9 @@ export class MovieService {
           'trailer',
         ],
         include: [
-          {
-            model: Genre, as: 'genres', attributes: [], through: { attributes: [] },
-            // where: {
-            //   name: {
-            //     [Op.in]: ['триллер', 'ужасы'],
-            //   },
-            // }
-            // where: { 
-            //   ...(genres?.length ? {
-            //     name: {
-            //       [Op.in]: genres
-            //     }
-            //   } : {})
-            // }
-          },
-          // { model: Country, through: { attributes: [] } },
-          // { model: Comment, attributes: { exclude: ['movieId'] } },
+          { model: Genre, as: 'genres', attributes: [], through: { attributes: [] } },
+          { model: Country, through: { attributes: [] } },
+          { model: Comment, attributes: { exclude: ['movieId'] } },
         ],
         where: {
           ...(search ? {
@@ -91,40 +73,18 @@ export class MovieService {
           } : {}),
         },
         group: ['Movie.movieId'],
-        // having: Sequelize.where(Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('genres.name'))), '>=', genres.length),
         having: {
           ...(genres?.length ? {
-            // count of genres
             [Op.and]: Sequelize.literal(`COUNT(DISTINCT CASE WHEN "genres"."name" IN (${genres.map(g => `'${g}'`).join(',')}) THEN "genres"."genreId" END) >= ${genres.length}`),
-            // [Op.and]: Sequelize.where(Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('genres.name'))), '=', genres.length),
-            // [Op.and]: {
-            //   '$genres.name$': {
-            //     [Op.in]: genres,
-            //   },
-            // },
           } : {}),
-          // ...(countries?.length ? {
-          //   [Op.and]: Sequelize.literal(`COUNT(DISTINCT CASE WHEN '$countries.name$' IN (${countries.map(c => `'${c}'`).join(',')}) THEN '$countries.name$' END) = ${countries.length}`),
-          // } : {}),
-          // },
-          // having: Sequelize.where(
-          //   Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.fn('CASE', {
-          //     when: {
-          //       [Op.or]: [
-          //         { 'genre.name': 'триллер' },
-          //         { 'genre.name': 'ужасы' },
-          //       ],
-          //     },
-          //     then: Sequelize.col('genres.name'),
-          //   }))),
-          //   2
-          // ),
+          ...(countries?.length ? {
+            [Op.and]: Sequelize.literal(`COUNT(DISTINCT CASE WHEN '$countries.name$' IN (${countries.map(c => `'${c}'`).join(',')}) THEN '$countries.name$' END) = ${countries.length}`),
+          } : {}),
         },
         subQuery: false,
         limit: 10,
         offset: ((page || 1) - 1) * 10,
       });
-      console.log('after query')
       
       for (let i = 0; i < movies.length; i++) {
         const persons = await movies[i].$get('persons', { include: [{ model: Person }, { model: Profession }] });
@@ -171,12 +131,20 @@ export class MovieService {
   updateMovie(dto: UpdateMovieDto): void {
     this.movieRepository.update(dto, { where: { id: dto.id } });
   }
+  
+  getAllGenres() {
+    return this.genreRepository.findAll();
+  }
+
+  getAllCountries() {
+    return this.countryRepository.findAll();
+  }
 
   updateGenre(dto: UpdateGenreDto): void {
     this.genreRepository.update(dto, { where: { id: dto.id } });
   }
 
-
+  
   async getModelById(id: number) {
     const movie = this.movieRepository.findByPk(id);
     if (!movie) {
