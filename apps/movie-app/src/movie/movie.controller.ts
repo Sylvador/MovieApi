@@ -3,9 +3,8 @@ import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { MovieService } from './movie.service';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
-import { UpdateMovieDto } from 'apps/api/src/dto/update-movie.dto';
-import {Movie} from "./models/movie.model";
 import {MoviePerson} from "../person/models/movie-person.model";
+import {FindAllMovieDto} from "./dto/findAll-movie.dto";
 
 @Controller()
 export class MovieController {

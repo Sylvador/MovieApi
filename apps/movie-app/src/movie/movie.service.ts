@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { InjectModel } from "@nestjs/sequelize";
 import { Movie } from "./models/movie.model";
@@ -11,8 +11,11 @@ import { Language } from "./models/language.model";
 import { Fact } from "./models/fact.model";
 import { Comment } from "../comment/models/comment.model";
 import { SimilarMovies } from "./models/similar-movies.model";
-import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
-import {FiltersDto} from "./dto/filters.dto";
+import {PersonProfession} from "../person/models/person-profession.model";
+import {MoviePerson} from "../person/models/movie-person.model";
+import {Op, Sequelize} from "sequelize";
+import {FindAllMovieDto} from "./dto/findAll-movie.dto";
+import {UpdateGenreDto} from "./dto/update-genre.dto";
 
 @Injectable()
 export class MovieService {
