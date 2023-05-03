@@ -18,7 +18,7 @@ export class MovieController {
   @ApiResponse({ status: 200, description: 'Фильм найден', type: Movie })
   @ApiResponse({ status: 404, description: 'Фильм не найден' })
   @ApiParam({ name: 'id', description: 'Идентификатор фильма', type: 'number' })
-  @Get(':id')
+  @Get('findById/:id')
   findOneMovie(@Param('id') id: number) {
     return this.movieClient.send('findOneMovie', id)
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
@@ -45,7 +45,6 @@ export class MovieController {
   ) {
     filters.genres = await new ParseArrayPipe({ items: String, separator: ' ', optional: true }).transform(filters.genres, { type: 'query', data: 'genres', metatype: String });
     filters.countries = await new ParseArrayPipe({ items: String, separator: ' ', optional: true }).transform(filters.countries, { type: 'query', data: 'countries', metatype: String });
-    filters.persons = await new ParseArrayPipe({ items: String, separator: ' ', optional: true }).transform(filters.persons, { type: 'query', data: 'persons', metatype: String });
     return this.movieClient.send('findAllMovie', { filters })
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }

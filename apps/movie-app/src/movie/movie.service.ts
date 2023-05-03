@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { InjectModel } from "@nestjs/sequelize";
 import { Movie } from "./models/movie.model";
@@ -11,11 +11,11 @@ import { Language } from "./models/language.model";
 import { Fact } from "./models/fact.model";
 import { Comment } from "../comment/models/comment.model";
 import { SimilarMovies } from "./models/similar-movies.model";
-import {PersonProfession} from "../person/models/person-profession.model";
-import {MoviePerson} from "../person/models/movie-person.model";
-import {Op, Sequelize} from "sequelize";
-import {FindAllMovieDto} from "./dto/findAll-movie.dto";
-import {UpdateGenreDto} from "./dto/update-genre.dto";
+import { PersonProfession } from "../person/models/person-profession.model";
+import { MoviePerson } from "../person/models/movie-person.model";
+import { Op, Sequelize } from "sequelize";
+import { FindAllMovieDto } from "./dto/findAll-movie.dto";
+import { UpdateGenreDto } from "./dto/update-genre.dto";
 
 @Injectable()
 export class MovieService {
@@ -27,9 +27,10 @@ export class MovieService {
     @InjectModel(MoviePerson) private moviePersonRepository: typeof MoviePerson
   ) { }
 
+  //#region movie
   async findAllMovie(filters: FindAllMovieDto): Promise<Movie[]> {
     try {
-      const { genres, countries, persons, page, rating, search } = filters;
+      const { genres, countries, person, page, rating, search } = filters;
       console.log('before query ***********')
       const movies: Movie[] = await this.movieRepository.findAll({
         attributes: [
@@ -50,8 +51,8 @@ export class MovieService {
         ],
         include: [
           { model: Genre, as: 'genres', attributes: [], through: { attributes: [] } },
-          { model: Country, through: { attributes: [] } },
-          { model: Comment, attributes: { exclude: ['movieId'] } },
+          { model: Country, attributes: [], through: { attributes: [] } },
+          { model: PersonProfession, include: [ { model: Person, attributes: [] } ], attributes: [], through: { attributes: [] } },
         ],
         where: {
           ...(search ? {
@@ -64,6 +65,11 @@ export class MovieService {
             '$genres.name$': {
               [Op.in]: genres,
             },
+          } : {}),
+          ...(person ? {
+            '$persons.person.name$': {
+              [Op.iLike]: `%${person}%`
+            }
           } : {}),
           ...(countries?.length ? {
             '$countries.name$': {
@@ -90,21 +96,33 @@ export class MovieService {
         offset: ((page || 1) - 1) * 10,
       });
 
+      //attach persons, genres, comments and countries
       for (let i = 0; i < movies.length; i++) {
         const persons = await movies[i].$get('persons', { include: [{ model: Person }, { model: Profession }] });
         movies[i].setDataValue('persons', persons);
-      }
 
-
-      for (let i = 0; i < movies.length; i++) {
         const genres = await movies[i].$get('genres', {
           joinTableAttributes: [],
           attributes: ['genreId', 'name'],
         } as any);
+        movies[i].setDataValue('genres', genres);
 
-        movies[i].setDataValue('genres', genres as any);
+        const countries = await movies[i].$get('countries', {
+          joinTableAttributes: [],
+          through: { attributes: [] }
+        } as any);
+        movies[i].setDataValue('countries', countries);
       }
 
+      // //attach genres
+      // for (let i = 0; i < movies.length; i++) {
+      //   const genres = await movies[i].$get('genres', {
+      //     joinTableAttributes: [],
+      //     attributes: ['genreId', 'name'],
+      //   } as any);
+
+      //   movies[i].setDataValue('genres', genres as any);
+      // }
 
       return movies;
     } catch (error) {
@@ -121,7 +139,7 @@ export class MovieService {
         { model: Comment, attributes: { exclude: ['movieId'] } },
         { model: Language, through: { attributes: [] } },
         { model: Fact, attributes: { exclude: ['movieId'] } },
-        { model: SimilarMovies, include: [{model: Movie}], attributes: {exclude: ['id', 'movieId1', 'movieId2']}},
+        { model: SimilarMovies, include: [{ model: Movie }], attributes: { exclude: ['id', 'movieId1', 'movieId2'] } },
       ]
     });
     if (!movie) {
@@ -129,8 +147,8 @@ export class MovieService {
     }
     const persons = await movie.$get('persons', {
       include: [
-        {model: Person},
-        {model: Profession},
+        { model: Person },
+        { model: Profession },
       ],
       attributes: [],
     });
@@ -139,13 +157,45 @@ export class MovieService {
     return movie.dataValues;
   }
 
+  async getMoviePersons(movieId: number): Promise<MoviePerson[]> {
+    const persons = await this.moviePersonRepository.findAll({
+      include: [
+        {
+          model: PersonProfession,
+          attributes: { exclude: ['id', 'professionId'] },
+          include: [
+            { model: Person },
+            { model: Movie, attributes: ['movieId'], through: { attributes: [] } }
+          ]
+        }
+      ],
+      where: { movieId: movieId },
+      attributes: [],
+    });
+    return persons;
+  }
+
+  updateMovie(dto: UpdateMovieDto): void {
+    this.movieRepository.update(dto, { where: { id: dto.id } });
+  }
+
+  async getModelById(id: number) {
+    const movie = this.movieRepository.findByPk(id);
+    if (!movie) {
+      throw new RpcException(new NotFoundException('Фильм с данным id не найден'));
+    }
+    return movie;
+  }
+  //#endregion
+  
+  //#region comment
   getCommentTree(comments: Comment[]): Comment[] {
     const map = {};
     const result: Comment[] = [];
 
     // создаем объект-карту элементов, чтобы было проще находить родительские элементы
     for (const item of comments) {
-      map[item.commentId] = {...item.dataValues, childComments: []};
+      map[item.commentId] = { ...item.dataValues, childComments: [] };
     }
 
     // проходимся по всем элементам и создаем связи между родительскими и дочерними элементами
@@ -159,46 +209,21 @@ export class MovieService {
 
     return result;
   }
+  //#endregion
 
-  updateMovie(dto: UpdateMovieDto): void {
-    this.movieRepository.update(dto, { where: { id: dto.id } });
-  }
-
+  //#region genre
   getAllGenres() {
     return this.genreRepository.findAll();
-  }
-
-  getAllCountries() {
-    return this.countryRepository.findAll();
   }
   
   updateGenre(dto: UpdateGenreDto): void {
     this.genreRepository.update(dto, { where: { id: dto.id } });
   }
+  //#endregion
 
-  async getMoviePersons(movieId: number): Promise<MoviePerson[]> {
-    const persons = await this.moviePersonRepository.findAll({
-      include: [
-        {
-          model: PersonProfession,
-          attributes: {exclude: ['id', 'professionId']},
-          include: [
-            {model: Person},
-            {model: Movie, attributes: ['movieId'], through: {attributes: []}}
-          ]
-        }
-      ],
-      where: {movieId: movieId},
-      attributes: [],
-    });
-    return persons;
+  //#region country
+  getAllCountries() {
+    return this.countryRepository.findAll();
   }
-
-  async getModelById(id: number) {
-    const movie = this.movieRepository.findByPk(id);
-    if (!movie) {
-      throw new RpcException(new NotFoundException('Фильм с данным id не найден'));
-    }
-    return movie;
-  }
+  //#endregion
 }

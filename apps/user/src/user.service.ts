@@ -21,8 +21,7 @@ export class UserService {
 
   async createUser(userDto: CreateUserDto): Promise<User> {
     const hashedPassword = await argon.hash(userDto.password);
-
-    return await this.userRepository.create({ ...userDto, hashedPassword });
+    return this.userRepository.create({ ...userDto, hashedPassword });
   }
 
   getUserByEmail(email: string): Promise<User> {

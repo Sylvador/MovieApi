@@ -62,8 +62,9 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Выход', description: 'Удаляет токены доступа' })
-  @ApiResponse({ status: 200, description: 'Токены доступа удалены' })
+  @ApiResponse({ status: 200, description: '' })
   @ApiResponse({ status: 403, description: 'Ошибка аутентификации' })
+  @HttpCode(200)
   @Post('logout')
   @UseGuards(AtGuard)
   logout(@GetCurrentUserId() id: number) {
@@ -80,6 +81,7 @@ export class AuthController {
     @GetCurrentUserId() userId: number,
     @GetCurrentUser('refreshToken') refreshToken: string,
   ): Observable<Tokens> {
+    console.log(userId, refreshToken);
     return this.authClient.send('refresh', { userId, refreshToken })
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }

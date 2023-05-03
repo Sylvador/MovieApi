@@ -10,18 +10,18 @@ export class UserController {
     ) { }
 
   @MessagePattern('get_user_by_id')
-  getUserById(@Payload() id: number, @Ctx() ctx) {
+  getUserById(@Payload() id: number) {
     return this.userService.getUserById(id);
   }
 
   @MessagePattern('get_user_by_email')
-  getUserByEmail(@Payload() email: string, @Ctx() ctx) {
+  getUserByEmail(@Payload() email: string) {
     return this.userService.getUserByEmail(email);
   }
 
   @MessagePattern('createUser')
-  createUser(@Payload() userDto: CreateUserDto, @Ctx() ctx) {
-    this.userService.createUser(userDto);
+  createUser(@Payload() userDto: CreateUserDto) {
+    return this.userService.createUser(userDto);
   }
 
   @EventPattern('logout')

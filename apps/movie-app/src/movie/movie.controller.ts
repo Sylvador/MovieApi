@@ -17,15 +17,17 @@ export class MovieController {
 
   @MessagePattern('findOneMovie')
   findOneMovie(@Payload() id: number): Promise<any> {
+    console.log('NO WAY IM HERE')
     return this.movieService.findOneMovie(id);
   }
 
-  @MessagePattern('GetAllGenres')
+  @MessagePattern('getAllGenres')
   getAllGenres() {
+    console.log("I HAVE TO BE HERE")
     return this.movieService.getAllGenres();
   }
 
-  @MessagePattern('GetAllCountries')
+  @MessagePattern('getAllCountries')
   getAllCountries() {
     return this.movieService.getAllCountries();
   }

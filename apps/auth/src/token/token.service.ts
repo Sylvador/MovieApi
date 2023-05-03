@@ -22,7 +22,8 @@ export class TokenService {
       email: tokenDto.email,
       isAdmin: tokenDto.isAdmin
     }
-    
+    console.log(this.config.get<string>('ACCESS_TOKEN_SECRET_KEY'))
+    console.log(this.config.get<string>('REFRESH_TOKEN_SECRET_KEY'))
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         jwtPayload,
