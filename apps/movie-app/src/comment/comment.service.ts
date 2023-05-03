@@ -9,7 +9,7 @@ import {RpcException} from "@nestjs/microservices";
 export class CommentService {
   constructor(@InjectModel(Comment) private commentRepository: typeof Comment,
               private movieService: MovieService) {}
-  async create(dto: AddCommentDto) {
+  async create(dto: AddCommentDto): Promise<Comment> {
     await this.movieService.getModelById(dto.movieId);
     if (dto.parentId) {
       const comment = await this.getModelById(dto.parentId);

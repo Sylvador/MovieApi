@@ -24,6 +24,16 @@ export class MovieController {
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
 
+  @ApiOperation({ summary: 'Получение актеров фильма', description: 'Находит всех актеров фильма по его идентификатору' })
+  @ApiResponse({ status: 200, description: 'Фильм найден', type: Movie })
+  @ApiResponse({ status: 404, description: 'Фильм не найден' })
+  @ApiParam({ name: 'id', description: 'Идентификатор фильма', type: 'number' })
+  @Get(':id/persons')
+  getMoviePersons(@Param('id') id: number) {
+    return this.movieClient.send('getMoviePersons', id)
+        .pipe(catchError(err => throwError(() => new RpcException(err.response))));
+  }
+
   @ApiOperation({ summary: 'Поиск фильмов', description: 'Находит фильмы по заданным фильтрам' })
   @ApiResponse({ status: 200, description: 'Фильмы найдены', type: [Movie] })
   @ApiResponse({ status: 404, description: 'Фильмы не найдены' })

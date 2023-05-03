@@ -1,4 +1,4 @@
-import {Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
+import {BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
 import {Movie} from "../../movie/models/movie.model";
 
 interface CommentCreationAttrs {
@@ -27,6 +27,9 @@ export class Comment extends Model<Comment, CommentCreationAttrs> {
     @Column({type: DataType.TEXT, allowNull: false})
     value: string;
 
+    @ForeignKey(() => Comment)
     @Column({type: DataType.INTEGER})
     parentId: number;
+    @HasMany(() => Comment)
+    childComments: Comment[];
 }
