@@ -17,12 +17,12 @@ export class PersonService {
                     { name: { [Op.iLike]: `%${search}%` } },
                     { enName: { [Op.iLike]: `%${search}%` } },
                 ]},
-            include: [{ model: Profession, where: { name: profession } }],
+            include: [{ model: Profession, through: {attributes: []}, where: { name: profession } }],
             limit: 10,
         });
    }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<PersonProfession[]> {
     const personProfessions = await this.personProfessionRepository.findAll({
         where: {personId: id},
         include: {all: true}

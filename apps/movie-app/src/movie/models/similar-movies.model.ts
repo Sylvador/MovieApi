@@ -9,12 +9,10 @@ export class SimilarMovies extends Model<SimilarMovies> {
     @ForeignKey(() => Movie)
     @Column({type: DataType.INTEGER, allowNull: false, unique: false, onDelete: 'CASCADE'})
     movieId1: number;
-    @BelongsTo(() => Movie)
-    movie1: Movie
 
     @ForeignKey(() => Movie)
     @Column({type: DataType.INTEGER, allowNull: false, unique: false, onDelete: 'CASCADE'})
     movieId2: number;
-    @BelongsTo(() => Movie)
+    @BelongsTo(() => Movie, 'movieId2')
     movie2: Movie
 }

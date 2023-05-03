@@ -19,4 +19,6 @@ export class MoviePerson extends Model<MoviePerson, MoviePersonCreationAttrs> {
     @ForeignKey(() => PersonProfession)
     @Column({type: DataType.INTEGER, allowNull: false, onDelete: 'CASCADE'})
     personProfessionId: number;
+    @BelongsTo(() => PersonProfession)
+    personProf: PersonProfession;
 }
