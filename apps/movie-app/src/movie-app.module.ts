@@ -18,22 +18,17 @@ import { SimilarMovies } from "./movie/models/similar-movies.model";
 import {SharedModule} from "@app/common/rmq/shared.module";
 import {Profession} from "./person/models/profession.model";
 import {PersonProfession} from "./person/models/person-profession.model";
-import { ConfigModule } from '@nestjs/config';
 
 @Module({
 	imports: [
 		SharedModule,
-		ConfigModule.forRoot({
-			envFilePath: `.${process.env.NODE_ENV}.env`,
-			isGlobal: true,
-		}),
 		SequelizeModule.forRoot({
 			dialect: 'postgres',
-			host: process.env.POSTGRES_HOST,
-			port: +process.env.POSTGRES_PORT,
-			username: process.env.POSTGRES_USER,
-			password: process.env.POSTGRES_PASSWORD,
-			database: process.env.POSTGRES_DB_MOVIE,
+			host: '195.133.147.66',
+			port: 5432,
+			username: 'postgres',
+			password: 'postgres',
+			database: 'movie',
 			models: [
 				Movie,
 				Person,
