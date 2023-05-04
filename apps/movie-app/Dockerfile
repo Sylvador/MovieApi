@@ -2,11 +2,11 @@ FROM node:16.17.0-alpine AS development
 
 WORKDIR /usr/src/app
 
-COPY package*.json .
+COPY package*.json ./
 
 RUN npm install
 
-COPY . .
+COPY . ./
 
 RUN npm run build auth
 
@@ -21,7 +21,7 @@ COPY package*.json ./
 
 RUN npm install --only=production
 
-COPY . .
+COPY . ./
 
 COPY --from=development /usr/src/app/dist ./dist
 
