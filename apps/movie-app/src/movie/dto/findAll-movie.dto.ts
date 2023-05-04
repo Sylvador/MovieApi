@@ -34,7 +34,7 @@ export class FindAllMovieDto {
   @ApiProperty({ type: [String], description: 'Массив названий стран для фильтрации фильмов.' })
   countries?: string[];
 
-  @ApiProperty({ description: 'Строка поиска для фильтрации фильмов по имени персоны.' })
+  @ApiProperty({ description: 'Строка поиска для фильтрации фильмов по имени персоны. Имя должно быть полное', example: 'Леонардо Дикаприо' })
   person?: string;
 
   @ApiProperty({ type: [String], description: 'Массив названий жанров для фильтрации фильмов.' })

@@ -1,5 +1,5 @@
-import { Controller } from '@nestjs/common';
-import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
+import { Controller, InternalServerErrorException } from '@nestjs/common';
+import { EventPattern, MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { MovieService } from './movie.service';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
@@ -17,13 +17,18 @@ export class MovieController {
 
   @MessagePattern('findOneMovie')
   findOneMovie(@Payload() id: number): Promise<any> {
-    console.log('NO WAY IM HERE')
-    return this.movieService.findOneMovie(id);
+    try {
+      return this.movieService.findOneMovie(id);
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
 
   @MessagePattern('getAllGenres')
   getAllGenres() {
-    console.log("I HAVE TO BE HERE")
     return this.movieService.getAllGenres();
   }
 

@@ -20,7 +20,7 @@ export class CommentService {
       }
 
     }
-    return this.commentRepository.create(dto, { returning: true });
+    return this.commentRepository.create({ ...dto, publishDate: new Date(), userName: dto.username }, { returning: true });
   }
 
   async getModelById(id: number) {

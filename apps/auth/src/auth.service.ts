@@ -17,14 +17,11 @@ export class AuthService {
 
   async signup(userDto: CreateUserDto): Promise<Tokens> {
     try {
-      console.log('AUTH SERVICE')
-      console.log(userDto)
       const candidate = await firstValueFrom(this.userClient.send('get_user_by_email', userDto.email));
       if (candidate) {
         throw new RpcException(new BadRequestException('Пользователь с таким email уже существует'));
       }
       const user: User = await firstValueFrom(this.userClient.send('createUser', userDto));
-      console.log(user);
       const tokens = await this.tokenService.generateTokens(user);
       this.tokenService.updateRtHash(user.userId, tokens.refreshToken);
       return tokens;

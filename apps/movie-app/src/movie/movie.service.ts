@@ -31,7 +31,6 @@ export class MovieService {
   async findAllMovie(filters: FindAllMovieDto): Promise<Movie[]> {
     try {
       const { genres, countries, person, page, rating, search } = filters;
-      console.log('before query ***********')
       const movies: Movie[] = await this.movieRepository.findAll({
         attributes: [
           'movieId',
@@ -126,25 +125,26 @@ export class MovieService {
 
       return movies;
     } catch (error) {
-      console.log(error);
       throw new RpcException(new BadRequestException(error.message));
     }
   }
 
   async findOneMovie(id: number): Promise<any> {
-    const movie: Movie = await this.movieRepository.findByPk(id, {
+    let movie: Movie = await this.movieRepository.findByPk(id, {
       include: [
         { model: Genre, through: { attributes: [] } },
         { model: Country, through: { attributes: [] } },
         { model: Comment, attributes: { exclude: ['movieId'] } },
         { model: Language, through: { attributes: [] } },
         { model: Fact, attributes: { exclude: ['movieId'] } },
-        { model: SimilarMovies, include: [{ model: Movie }], attributes: { exclude: ['id', 'movieId1', 'movieId2'] } },
-      ]
+        // { model: SimilarMovies, include: [{ model: Movie }], attributes: { exclude: ['id', 'movieId1', 'movieId2'] } },
+      ],
     });
     if (!movie) {
       throw new RpcException(new NotFoundException('Фильм с данным id не найден'));
     }
+    const similarMovies = await movie.$get('similarMovies', { include: [{ model: Movie }], attributes: { exclude: ['id', 'movieId1', 'movieId2'] } });
+    movie.setDataValue('similarMovies', similarMovies);
     const persons = await movie.$get('persons', {
       include: [
         { model: Person },
@@ -153,8 +153,10 @@ export class MovieService {
       attributes: [],
     });
     movie.setDataValue('persons', persons);
-    movie.setDataValue('comments', this.getCommentTree(movie.comments));
-    return movie.dataValues;
+    const commentsTree = this.getCommentTree(movie.comments)
+    movie = movie.toJSON();
+    movie.comments = commentsTree;
+    return movie;
   }
 
   async getMoviePersons(movieId: number): Promise<MoviePerson[]> {
@@ -195,6 +197,7 @@ export class MovieService {
 
     // создаем объект-карту элементов, чтобы было проще находить родительские элементы
     for (const item of comments) {
+      console.log(item)
       map[item.commentId] = { ...item.dataValues, childComments: [] };
     }
 

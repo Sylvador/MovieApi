@@ -1,7 +1,7 @@
 export class AddCommentDto {
     movieId: number;
-    userName: string;
-    publishDate: Date;
+    username: string;
+    // publishDate: Date;
     value: string;
     parentId?: number;
 }

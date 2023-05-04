@@ -6,6 +6,8 @@ import { UpdateMovieDto } from "./dto/update-movie.dto";
 import { FindAllMovieDto } from "../../movie-app/src/movie/dto/findAll-movie.dto";
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Movie } from "../../movie-app/src/movie/models/movie.model";
+import { AtGuard } from "./guards";
+import { GetCurrentUser, GetCurrentUserId } from "@app/common/decorators";
 
 @ApiTags('Фильмы')
 @Controller('movie')
@@ -54,12 +56,13 @@ export class MovieController {
   @ApiResponse({ status: 400, description: 'Некорректный запрос' })
   @HttpCode(201)
   @Post(':id')
-  // @UseGuards(AtGuard)
+  @UseGuards(AtGuard)
   addComment(
     @Param('id') id: number,
     @Body() dto: AddCommentDto,
+    @GetCurrentUser('username') username: string,
   ) {
-    return this.movieClient.send('addComment', { movieId: id, ...dto })
+    return this.movieClient.send('addComment', { movieId: id, username, ...dto })
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
 

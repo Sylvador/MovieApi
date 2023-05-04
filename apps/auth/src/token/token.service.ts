@@ -20,10 +20,9 @@ export class TokenService {
     const jwtPayload: JwtPayload = {
       sub: tokenDto.userId,
       email: tokenDto.email,
+      username: tokenDto.username,
       isAdmin: tokenDto.isAdmin
     }
-    console.log(this.config.get<string>('ACCESS_TOKEN_SECRET_KEY'))
-    console.log(this.config.get<string>('REFRESH_TOKEN_SECRET_KEY'))
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         jwtPayload,
@@ -49,7 +48,6 @@ export class TokenService {
     const user: User = await firstValueFrom(this.userClient.send('get_user_by_id', userId));
 
     if (!user?.hashedRt) {
-      console.log(userId)
       throw new RpcException(new ForbiddenException('Invalid Credentials'));
     }
     const rtMatches = argon.verify(user.hashedRt, rt);
