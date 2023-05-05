@@ -49,6 +49,13 @@ export class MovieController {
 
   @EventPattern('updateGenre')
   updateGenre(@Payload() dto: UpdateGenreDto): void {
-    this.movieService.updateGenre(dto);
+    try {
+      this.movieService.updateGenre(dto);
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
 }

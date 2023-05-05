@@ -20,7 +20,7 @@ export class MovieController {
   @ApiResponse({ status: 200, description: 'Фильм найден', type: Movie })
   @ApiResponse({ status: 404, description: 'Фильм не найден' })
   @ApiParam({ name: 'id', description: 'Идентификатор фильма', type: 'number' })
-  @Get('findById/:id')
+  @Get('find-by-id/:id')
   findOneMovie(@Param('id') id: number) {
     return this.movieClient.send('findOneMovie', id)
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
@@ -55,7 +55,7 @@ export class MovieController {
   @ApiResponse({ status: 201, description: 'Комментарий добавлен' })
   @ApiResponse({ status: 400, description: 'Некорректный запрос' })
   @HttpCode(201)
-  @Post(':id')
+  @Post('add-comment/:id')
   @UseGuards(AtGuard)
   addComment(
     @Param('id') id: number,

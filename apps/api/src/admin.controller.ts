@@ -1,11 +1,13 @@
-import { Body, Controller, Get, Inject, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { catchError, throwError } from "rxjs";
 import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiBody } from "@nestjs/swagger";
 import { UpdateGenreDto } from "./dto/update-genre.dto";
 import { UpdateMovieDto } from "./dto/update-movie.dto";
+import { AdminGuard } from "./guards/admin.guard";
 
 @ApiTags('Администрирование')
+@UseGuards(AdminGuard)
 @Controller('admin')
 export class AdminController {
   constructor(
@@ -17,7 +19,7 @@ export class AdminController {
   @ApiResponse({ status: 400, description: 'Ошибка при обновлении жанра' })
   @ApiParam({ name: 'id', description: 'Идентификатор жанра', type: 'string' })
   @ApiBody({ type: UpdateGenreDto })
-  @Post('genre/:id')
+  @Patch('genre/:id')
   updateGenre(
     @Param('id') id: string,
     @Body('name') name: string
@@ -31,12 +33,12 @@ export class AdminController {
   @ApiResponse({ status: 400, description: 'Ошибка при обновлении фильма' })
   @ApiParam({ name: 'id', description: 'Идентификатор фильма', type: 'number' })
   @ApiBody({ type: UpdateMovieDto })
-  @Post('movie/:id')
+  @Patch('movie/:id')
   updateMovie(
     @Param('id') id: number,
-    @Body('title') title: string,
+    @Body('name') name: string,
   ): void {
-    this.movieClient.emit('updateMovie', { id, title })
+    this.movieClient.emit('updateMovie', { id, name })
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
 }

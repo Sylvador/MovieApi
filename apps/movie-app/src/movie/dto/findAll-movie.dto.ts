@@ -39,4 +39,7 @@ export class FindAllMovieDto {
 
   @ApiProperty({ type: [String], description: 'Массив названий жанров для фильтрации фильмов.' })
   genres?: string[];
+
+  @ApiProperty({ description: 'Порядок сортировки по дате премьеры. Любое значение, кроме new, будет сортировать по возрастанию', example: 'new'})
+  sort?: string;
 }

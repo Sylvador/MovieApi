@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { InjectModel } from "@nestjs/sequelize";
 import { Movie } from "./models/movie.model";
@@ -30,7 +30,11 @@ export class MovieService {
   //#region movie
   async findAllMovie(filters: FindAllMovieDto): Promise<Movie[]> {
     try {
-      const { genres, countries, person, page, rating, search } = filters;
+      const { genres, countries, person, page, rating, search, votes, sort } = filters;
+      let order: string;
+      if (sort) {
+        sort == 'new' ? order = 'DESC' : order = 'ASC'
+      }
       const movies: Movie[] = await this.movieRepository.findAll({
         attributes: [
           'movieId',
@@ -80,7 +84,15 @@ export class MovieService {
               [Op.gte]: rating,
             }
           } : {}),
+          ...(votes ? {
+            votes: {
+              [Op.gte]: votes,
+            }
+          } : {}),
         },
+        ...(sort ? {
+          order: [['premiere', order]]
+        } : {}),
         group: ['Movie.movieId'],
         having: {
           ...(genres?.length ? {
@@ -178,7 +190,7 @@ export class MovieService {
   }
 
   updateMovie(dto: UpdateMovieDto): void {
-    this.movieRepository.update(dto, { where: { id: dto.id } });
+    this.movieRepository.update(dto, { where: { movieId: dto.id } });
   }
 
   async getModelById(id: number) {
@@ -197,7 +209,6 @@ export class MovieService {
 
     // создаем объект-карту элементов, чтобы было проще находить родительские элементы
     for (const item of comments) {
-      console.log(item)
       map[item.commentId] = { ...item.dataValues, childComments: [] };
     }
 
@@ -220,7 +231,11 @@ export class MovieService {
   }
   
   updateGenre(dto: UpdateGenreDto): void {
-    this.genreRepository.update(dto, { where: { id: dto.id } });
+    try {
+      this.genreRepository.update({ name: dto.name }, { where: { genreId: dto.id } });
+    } catch (error) {
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
   //#endregion
 

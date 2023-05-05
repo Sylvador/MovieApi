@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BelongsToMany, Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
+import { BelongsToMany, Column, DataType, HasMany, Index, Model, Table } from 'sequelize-typescript';
 import { Movie } from '../../movie/models/movie.model';
 import { MoviePerson } from './movie-person.model';
 import { PersonProfession } from './person-profession.model';
@@ -19,10 +19,12 @@ export class Person extends Model<Person, PersonCreationAttrs> {
     personId: number;
 
     @ApiProperty({ description: 'Имя персоны', type: 'string', example: 'Том Хэнкс' })
+    @Index
     @Column({ type: DataType.STRING })
     name: string;
 
     @ApiProperty({ description: 'Имя персоны на английском', type: 'string', example: 'Tom Hanks' })
+    @Index
     @Column({ type: DataType.STRING })
     enName: string;
 

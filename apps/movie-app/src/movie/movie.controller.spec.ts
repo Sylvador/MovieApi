@@ -69,7 +69,7 @@ describe('MovieController', () => {
 
   describe('updateGenre', () => {
     it('should update a genre', async () => {
-      const dto: UpdateGenreDto = { id: 1, name: 'Updated Genre' };
+      const dto: UpdateGenreDto = { id: 1, name: 'Обновлённый жанр', enName: 'Updated Genre' };
       jest.spyOn(service, 'updateGenre').mockImplementation(() => of(null));
 
       expect(await controller.updateGenre(dto)).toBeUndefined();
