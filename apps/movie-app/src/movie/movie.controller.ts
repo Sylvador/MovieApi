@@ -11,12 +11,19 @@ export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
   @MessagePattern('findAllMovie')
-  findAllMovie(@Payload('filters') filters: FindAllMovieDto) {
-    return this.movieService.findAllMovie(filters);
+  async findAllMovie(@Payload('filters') filters: FindAllMovieDto) {
+    try {
+      return this.movieService.findAllMovie(filters);
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
 
   @MessagePattern('findOneMovie')
-  findOneMovie(@Payload() id: number): Promise<any> {
+  async findOneMovie(@Payload() id: number): Promise<any> {
     try {
       return this.movieService.findOneMovie(id);
     } catch (error) {
@@ -28,27 +35,55 @@ export class MovieController {
   }
 
   @MessagePattern('getAllGenres')
-  getAllGenres() {
-    return this.movieService.getAllGenres();
+  async getAllGenres() {
+    try {
+      return this.movieService.getAllGenres();
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
 
   @MessagePattern('getAllCountries')
-  getAllCountries() {
-    return this.movieService.getAllCountries();
+  async getAllCountries() {
+    try {
+      return this.movieService.getAllCountries();
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
 
   @MessagePattern('getMoviePersons')
-  getMoviePersons(@Payload() id: number): Promise<MoviePerson[]> {
-    return this.movieService.getMoviePersons(id);
+  async getMoviePersons(@Payload() id: number): Promise<MoviePerson[]> {
+    try {
+      return this.movieService.getMoviePersons(id);
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
 
   @EventPattern('updateMovie')
-  updateMovie(@Payload() dto: UpdateMovieDto): void {
-    this.movieService.updateMovie(dto);
+  async updateMovie(@Payload() dto: UpdateMovieDto): Promise<void> {
+    try {
+      this.movieService.updateMovie(dto);
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
 
   @EventPattern('updateGenre')
-  updateGenre(@Payload() dto: UpdateGenreDto): void {
+  async updateGenre(@Payload() dto: UpdateGenreDto): Promise<void> {
     try {
       this.movieService.updateGenre(dto);
     } catch (error) {

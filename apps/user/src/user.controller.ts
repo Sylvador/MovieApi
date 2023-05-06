@@ -1,7 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, InternalServerErrorException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { MessagePattern, EventPattern, Payload, Ctx } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
+import { RpcException } from '@nestjs/microservices';
+import { User } from './user.model';
 
 @Controller()
 export class UserController {
@@ -10,28 +12,62 @@ export class UserController {
     ) { }
 
   @MessagePattern('get_user_by_id')
-  getUserById(@Payload() id: number) {
-    return this.userService.getUserById(id);
+  async getUserById(@Payload() id: number): Promise<User> {
+    try {
+      return this.userService.getUserById(id);
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
 
   @MessagePattern('get_user_by_email')
-  getUserByEmail(@Payload() email: string) {
-    return this.userService.getUserByEmail(email);
+  async getUserByEmail(@Payload() email: string): Promise<User> {
+    try {
+      return this.userService.getUserByEmail(email);
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
 
   @MessagePattern('createUser')
-  createUser(@Payload() userDto: CreateUserDto) {
-    return this.userService.createUser(userDto);
+  async createUser(@Payload() userDto: CreateUserDto): Promise<User> {
+    try {
+      return this.userService.createUser(userDto);
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
 
   @EventPattern('logout')
   async logout(@Payload() id: number): Promise<void> {
-    this.userService.logout(id);
+    try {
+      this.userService.logout(id);
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
 
   @EventPattern('updateRtHash')
   async updateRtHash(@Payload() payload: { userId: number; hashedRt: string }): Promise<void> {
-    this.userService.updateRtHash(payload.userId, payload.hashedRt);
+    try {
+      this.userService.updateRtHash(payload.userId, payload.hashedRt);
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      throw new RpcException(new InternalServerErrorException(error.message));
+    }
   }
 }
-
