@@ -7,7 +7,7 @@ import { SharedModule } from '@app/common/rmq/shared.module';
 @Module({
   imports: [
     TokenModule,
-    SharedModule.registerRmq('USER_SERVICE', 'user_queue'),
+    SharedModule.registerRmq('USER_SERVICE', process.env.USER_QUEUE),
   ],
   controllers: [AuthController],
   providers: [AuthService],

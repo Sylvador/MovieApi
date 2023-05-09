@@ -8,8 +8,10 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(ApiModule);
   app.setGlobalPrefix('api')
+  app.enableCors();
 
-  const configService = new ConfigService();
+  const configService = app.get(ConfigService);
+  
   const PORT = configService.get<string>('PORT');
   const config = new DocumentBuilder()
     .setTitle('Movie API')

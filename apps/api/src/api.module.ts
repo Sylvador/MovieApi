@@ -11,9 +11,6 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    SharedModule.registerRmq('AUTH_SERVICE', 'auth_queue'),
-    SharedModule.registerRmq('USER_SERVICE', 'user_queue'),
-    SharedModule.registerRmq('MOVIE_SERVICE', 'movie_queue'),
     JwtModule.register({
       global: true,
       secret: process.env.ACCESS_TOKEN_SECRET_KEY || 'at-secret'
@@ -21,6 +18,9 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       envFilePath: `.${process.env.NODE_ENV}.env`,
     }),
+    SharedModule.registerRmq('AUTH_SERVICE', process.env.AUTH_QUEUE),
+    SharedModule.registerRmq('USER_SERVICE', process.env.USER_QUEUE),
+    SharedModule.registerRmq('MOVIE_SERVICE', process.env.MOVIE_QUEUE),
   ],
   controllers: [
     AuthController,
