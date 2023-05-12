@@ -99,7 +99,7 @@ export class MovieService {
             [Op.and]: Sequelize.literal(`COUNT(DISTINCT CASE WHEN "genres"."name" IN (${genres.map(g => `'${g}'`).join(',')}) THEN "genres"."genreId" END) >= ${genres.length}`),
           } : {}),
           ...(countries?.length ? {
-            [Op.and]: Sequelize.literal(`COUNT(DISTINCT CASE WHEN '$countries.name$' IN (${countries.map(c => `'${c}'`).join(',')}) THEN '$countries.name$' END) = ${countries.length}`),
+            [Op.and]: Sequelize.literal(`COUNT(DISTINCT CASE WHEN "countries"."name" IN (${countries.map(c => `'${c}'`).join(',')}) THEN "countries"."name" END) >= ${countries.length}`),
           } : {}),
         },
         subQuery: false,
