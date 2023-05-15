@@ -11,11 +11,11 @@ export class UserService {
     @InjectModel(User) private readonly userRepository: typeof User,
   ) { }
 
-  getUserById(id: number): Promise<User> {
+  async getUserById(id: number): Promise<User> {
     return this.userRepository.findByPk(id);
   }
 
-  updateRtHash(userId: number, hashedRt: string) {
+  async updateRtHash(userId: number, hashedRt: string): Promise<void> {
     this.userRepository.update({ hashedRt }, { where: { userId } });
   }
 
@@ -24,13 +24,11 @@ export class UserService {
     return this.userRepository.create({ ...userDto, hashedPassword });
   }
 
-  getUserByEmail(email: string): Promise<User> {
+  async getUserByEmail(email: string): Promise<User> {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  logout(userId: number) {
+  async logout(userId: number): Promise<void> {
     this.userRepository.update({ hashedRt: null }, { where: { userId } });
   }
 }
-
-

@@ -14,7 +14,7 @@ export class PersonService {
   ) { }
 
   @cache
-  async findAll(search: string, profession: string): Promise<Person[]> {
+  async findAll(search: string, profession?: string): Promise<Person[]> {
     return this.personRepository.findAll({
       where: {
         [Op.or]: [

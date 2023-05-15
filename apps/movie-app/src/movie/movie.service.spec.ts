@@ -15,9 +15,12 @@ import { Fact } from './models/fact.model';
 import { Language } from './models/language.model';
 import { SimilarMovies } from './models/similar-movies.model';
 import * as SequelizeMock from 'sequelize-mock';
+import { MoviePerson } from '../person/models/movie-person.model';
+import { PersonProfession } from '../person/models/person-profession.model';
+import { Person } from '../person/models/person.model';
 
 describe('MovieService', () => {
-  let service: MovieService;
+  let movieService: MovieService;
   let movieRepository: typeof Movie;
   let genreRepository: typeof Genre;
   
@@ -33,7 +36,7 @@ describe('MovieService', () => {
             create: jest.fn(),
             update: jest.fn(),
             destroy: jest.fn(),
-            $get: jest.fn().mockResolvedValue([{ name: 'Person 1' }, { name: 'Person 2' }]),
+            $get: jest.fn(),
           },
         },
         {
@@ -46,10 +49,22 @@ describe('MovieService', () => {
           provide: getModelToken(Country),
           useValue: {},
         },
+        {
+          provide: getModelToken(Comment),
+          useValue: {},
+        },
+        {
+          provide: getModelToken(SimilarMovies),
+          useValue: {},
+        },
+        {
+          provide: getModelToken(MoviePerson),
+          useValue: {},
+        }
       ],
     }).compile();
 
-    service = module.get<MovieService>(MovieService);
+    movieService = module.get<MovieService>(MovieService);
     movieRepository = module.get(getModelToken(Movie));
     genreRepository = module.get<typeof Genre>(getModelToken(Genre));
 
@@ -60,25 +75,37 @@ describe('MovieService', () => {
       const DBConnectionMock = new SequelizeMock();
       const movieMock = DBConnectionMock.define('movies', {
         'name': 'Test Movie',
-    }, {
-        instanceMethods: {
-            
-        },
     });
-      const filters: FindAllMovieDto = { name: 'test' };
+      const filters: FindAllMovieDto = { page: 1 };
       jest.spyOn(movieRepository, 'findAll').mockResolvedValueOnce(movieMock);
 
-      expect(await service.findAllMovie(filters)).toBe(movieMock);
+      expect(await movieService.findAllMovie(filters)).toBe(movieMock);
       expect(movieRepository.findAll).toHaveBeenCalledWith({
-        where: { ...filters },
-        include: [
-          { model: Genre, through: { attributes: [] } },
-          { model: Country, through: { attributes: [] } },
-          { model: Comment, attributes: { exclude: ['movieId'] } },
-          { model: Language, through: { attributes: [] } },
-          { model: Fact, attributes: { exclude: ['movieId'] } },
-          { model: SimilarMovies },
+        attributes: [
+          'movieId',
+          'name',
+          'enName',
+          'type',
+          'rating',
+          'votes',
+          'movieLength',
+          'description',
+          'premiere',
+          'slogan',
+          'shortDescription',
+          'ageRating',
+          'poster',
+          'trailer',
         ],
+        include: [
+          { model: Genre, as: 'genres', attributes: [], through: { attributes: [] } },
+          { model: Country, attributes: [], through: { attributes: [] } },
+          { model: PersonProfession, include: [ { model: Person, attributes: [] } ], attributes: [], through: { attributes: [] } },
+        ],
+        where: {},
+        group: ['Movie.movieId'],
+        having: {},
+        subQuery: false,
         limit: 10,
         offset: 0,
       });
@@ -86,33 +113,37 @@ describe('MovieService', () => {
   });
 
   describe('findOneMovie', () => {
-    it('should return a movie', async () => {
+    it('should return a movie with the given id', async () => {
       const DBConnectionMock = new SequelizeMock();
+      const commentMock = DBConnectionMock.define('comments', {
+        'value': 'Test Comment',
+      });
       const movieMock = DBConnectionMock.define('movies', {
         'name': 'Test Movie',
+    });
+      console.log(movieMock)
+      const movieId = 1;
+      movieMock.id = movieId;
+      movieMock.$get = jest.fn();
+      movieMock.setDataValue = jest.fn();
+      movieMock.toJSON = jest.fn().mockImplementationOnce(() => {
+        movieMock.comments = [];
+        return movieMock;
       });
-      movieMock.$get = () => {};
-      movieMock.setDataValue = () => {};
-      jest.spyOn(movieMock, '$get').mockResolvedValueOnce('test persons');
-      jest.spyOn(movieRepository, 'findByPk').mockResolvedValueOnce(movieMock);
 
-      expect(await service.findOneMovie(1)).toBe(movieMock);
-      expect(movieRepository.findByPk).toHaveBeenCalledWith(1, {
-        include: [
-          { model: Genre, through: { attributes: [] } },
-          { model: Country, through: { attributes: [] } },
-          { model: Comment, attributes: { exclude: ['movieId'] } },
-          { model: Language, through: { attributes: [] } },
-          { model: Fact, attributes: { exclude: ['movieId'] } },
-          { model: SimilarMovies },
-        ],
-      });
+      jest.spyOn(movieRepository, 'findByPk').mockResolvedValueOnce(movieMock);
+      jest.spyOn(movieService, 'getCommentTree').mockReturnValueOnce(commentMock)
+
+      const result = await movieService.findOneMovie(movieId);
+
+      expect(movieRepository.findByPk).toHaveBeenCalledWith(movieId, expect.any(Object));
+      expect(result).toEqual(movieMock);
     });
 
     it('should throw an exception if movie is not found', async () => {
-      jest.spyOn(movieRepository, 'findByPk').mockImplementation(() => Promise.resolve(null));
+      jest.spyOn(movieRepository, 'findByPk').mockImplementation(jest.fn());
 
-      await expect(service.findOneMovie(1)).rejects.toThrowError(
+      await expect(movieService.findOneMovie(1)).rejects.toThrowError(
         new RpcException(new NotFoundException('Фильм с данным id не найден')),
       );
     });
@@ -123,8 +154,8 @@ describe('MovieService', () => {
       const dto: UpdateMovieDto = { id: 1, name: 'Updated Movie' };
       jest.spyOn(movieRepository, 'update').mockImplementation(() => Promise.resolve(null));
 
-      expect(await service.updateMovie(dto)).toBeUndefined();
-      expect(movieRepository.update).toHaveBeenCalledWith(dto, { where: { id: dto.id } });
+      expect(await movieService.updateMovie(dto)).toBeUndefined();
+      expect(movieRepository.update).toHaveBeenCalledWith(dto, { where: { movieId: dto.id } });
     });
   });
 
@@ -133,8 +164,8 @@ describe('MovieService', () => {
       const dto: UpdateGenreDto = { id: 1, name: 'Обновлённый жанр', enName: 'Updated Genre' };
       jest.spyOn(genreRepository, 'update').mockImplementation(() => Promise.resolve(null));
 
-      expect(await service.updateGenre(dto)).toBeUndefined();
-      expect(genreRepository.update).toHaveBeenCalledWith(dto, { where: { id: dto.id } });
+      expect(await movieService.updateGenre(dto)).toBeUndefined();
+      expect(genreRepository.update).toHaveBeenCalledWith({ name: dto.name }, { where: { genreId: dto.id } });
     });
   });
 
@@ -143,14 +174,14 @@ describe('MovieService', () => {
       const result = movieRepository.create({ name: 'Test Movie' });
       jest.spyOn(movieRepository, 'findByPk').mockImplementation(() => Promise.resolve(result));
 
-      expect(await service.getModelById(1)).toBe(result);
+      expect(await movieService.getModelById(1)).toBe(result);
       expect(movieRepository.findByPk).toHaveBeenCalledWith(1);
     });
 
     it('should throw an exception if movie is not found', async () => {
       jest.spyOn(movieRepository, 'findByPk').mockImplementation(() => Promise.reject(new Error('Фильм с данным id не найден')));
 
-      await expect(service.getModelById(1)).rejects.toThrowError(
+      await expect(movieService.getModelById(1)).rejects.toThrowError(
         new RpcException(new NotFoundException('Фильм с данным id не найден')),
       );
     });

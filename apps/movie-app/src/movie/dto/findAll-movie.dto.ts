@@ -1,45 +1,45 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class FindAllMovieDto {
-  @ApiProperty({ description: 'Номер страницы для получения.' })
+  @ApiProperty({ description: 'Номер страницы для получения.', required: false })
   page?: number;
 
-  @ApiProperty({ description: 'Идентификатор фильма для получения.' })
+  @ApiProperty({ description: 'Идентификатор фильма для получения.', required: false})
   movieId?: number;
 
-  @ApiProperty({ description: 'Строка поиска для фильтрации фильмов.' })
+  @ApiProperty({ description: 'Строка поиска для фильтрации фильмов.', required: false})
   search?: string;
 
-  @ApiProperty({ description: 'Название фильма для фильтрации.' })
+  @ApiProperty({ description: 'Название фильма для фильтрации.', required: false})
   name?: string;
 
-  @ApiProperty({ description: 'Английское название фильма для фильтрации.' })
+  @ApiProperty({ description: 'Английское название фильма для фильтрации.', required: false})
   enName?: string;
 
-  @ApiProperty({ description: 'Тип фильма для фильтрации.' })
+  @ApiProperty({ description: 'Тип фильма для фильтрации.', required: false})
   type?: string;
 
-  @ApiProperty({ description: 'Минимальный рейтинг фильма для фильтрации.' })
+  @ApiProperty({ description: 'Минимальный рейтинг фильма для фильтрации.', required: false})
   rating?: number;
 
-  @ApiProperty({ description: 'Минимальное количество голосов фильма для фильтрации.' })
+  @ApiProperty({ description: 'Минимальное количество голосов фильма для фильтрации.', required: false})
   votes?: number;
 
-  @ApiProperty({ description: 'Дата премьеры фильма для фильтрации.' })
+  @ApiProperty({ description: 'Дата премьеры фильма для фильтрации.', required: false})
   premiere?: Date;
 
-  @ApiProperty({ description: 'Минимальный возрастной рейтинг фильма для фильтрации.' })
+  @ApiProperty({ description: 'Минимальный возрастной рейтинг фильма для фильтрации.', required: false})
   ageRating?: number;
 
-  @ApiProperty({ type: [String], description: 'Массив названий стран для фильтрации фильмов.' })
+  @ApiProperty({ type: [String], description: 'Массив названий стран для фильтрации фильмов.', required: false})
   countries?: string[];
 
-  @ApiProperty({ description: 'Строка поиска для фильтрации фильмов по имени персоны. Имя должно быть полное', example: 'Леонардо Дикаприо' })
+  @ApiProperty({ description: 'Строка поиска для фильтрации фильмов по имени персоны. Имя должно быть полное', example: 'Леонардо Дикаприо', required: false})
   person?: string;
 
-  @ApiProperty({ type: [String], description: 'Массив названий жанров для фильтрации фильмов.' })
+  @ApiProperty({ type: [String], description: 'Массив названий жанров для фильтрации фильмов.', required: false})
   genres?: string[];
 
-  @ApiProperty({ description: 'Порядок сортировки по дате премьеры. Любое значение, кроме new, будет сортировать по возрастанию', example: 'new'})
+  @ApiProperty({ description: 'Порядок сортировки по дате премьеры. Любое значение, кроме new, будет сортировать по возрастанию', example: 'new', required: false })
   sort?: string;
 }

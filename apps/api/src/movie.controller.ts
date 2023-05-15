@@ -40,7 +40,7 @@ export class MovieController {
   @ApiResponse({ status: 200, description: 'Фильмы найдены', type: [Movie] })
   @ApiResponse({ status: 404, description: 'Фильмы не найдены' })
   @ApiQuery({ name: 'search', description: 'Строка поиска', required: false })
-  @ApiBody({ type: FindAllMovieDto })
+  @ApiBody({ type: FindAllMovieDto, required: false })
   @Get()
   async findAllMovies(
     @Query() filters: FindAllMovieDto,

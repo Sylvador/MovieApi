@@ -109,20 +109,31 @@ export class MovieService {
 
       //attach persons, genres, comments and countries
       for (let i = 0; i < movies.length; i++) {
-        const persons = await movies[i].$get('persons', { include: [{ model: Person }, { model: Profession }] });
-        movies[i].setDataValue('persons', persons);
+        const personProfession = await movies[i].$get('persons', { include: [{ model: Person }, { model: Profession }] });
+        const sortedPersons: Map<string, Person[]> = new Map();
+        personProfession.forEach(person => {
+          if (sortedPersons.has(person.profession.name)) {
+            sortedPersons.set(person.profession.name, [...sortedPersons.get(person.profession.name), person.person]);
+          } else {
+            sortedPersons.set(person.profession.name, [person.person]);
+          }
+        })
 
         const genres = await movies[i].$get('genres', {
           joinTableAttributes: [],
           attributes: ['genreId', 'name'],
         } as any);
-        movies[i].setDataValue('genres', genres);
 
         const countries = await movies[i].$get('countries', {
           joinTableAttributes: [],
           through: { attributes: [] }
         } as any);
-        movies[i].setDataValue('countries', countries);
+
+        movies[i] = movies[i].toJSON();
+
+        movies[i].persons = Object.fromEntries(sortedPersons) as any;
+        movies[i].genres = genres as any;
+        movies[i].countries = countries as any;
       }
 
       // //attach genres

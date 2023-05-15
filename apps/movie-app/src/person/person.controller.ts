@@ -9,7 +9,7 @@ export class PersonController {
   constructor(private readonly personService: PersonService) { }
 
   @MessagePattern('findAllPerson')
-  findAll(@Payload() dto: { search: string, profession: string }): Promise<Person[]> {
+  findAll(@Payload() dto: { search: string, profession?: string }): Promise<Person[]> {
     try {
       return this.personService.findAll(dto.search, dto.profession);
     } catch (error) {
