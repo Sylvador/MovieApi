@@ -16,10 +16,8 @@ export class MovieController {
       return this.movieService.findAllMovie(filters);
     } catch (error) {
       if (error instanceof RpcException) {
-        console.log('RpcExcpetion **************************')
         throw error;
       }
-      console.log('InternalServerErrorException ******************************')
       throw new RpcException(new InternalServerErrorException(error.message));
     }
   }

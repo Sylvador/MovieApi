@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Inject, Param, ParseArrayPipe, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Inject, Param, ParseArrayPipe, ParseIntPipe, Post, Query, UseGuards } from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { catchError, throwError } from "rxjs";
 import { AddCommentDto } from "./dto/add-comment.dto";
@@ -20,7 +20,7 @@ export class MovieController {
   @ApiResponse({ status: 404, description: 'Фильм не найден' })
   @ApiParam({ name: 'id', description: 'Идентификатор фильма', type: 'number' })
   @Get('find-by-id/:id')
-  findOneMovie(@Param('id') id: number) {
+  findOneMovie(@Param('id', ParseIntPipe) id: number) {
     return this.movieClient.send('findOneMovie', id)
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
@@ -30,7 +30,7 @@ export class MovieController {
   @ApiResponse({ status: 404, description: 'Фильм не найден' })
   @ApiParam({ name: 'id', description: 'Идентификатор фильма', type: 'number' })
   @Get(':id/persons')
-  getMoviePersons(@Param('id') id: number) {
+  getMoviePersons(@Param('id', ParseIntPipe) id: number) {
     return this.movieClient.send('getMoviePersons', id)
         .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
