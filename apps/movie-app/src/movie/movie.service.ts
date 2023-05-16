@@ -29,127 +29,127 @@ export class MovieService {
 
   //#region movie
   async findAllMovie(filters: FindAllMovieDto): Promise<Movie[]> {
-    try {
-      const { genres, countries, person, page, rating, search, votes, sort } = filters;
-      let order: string;
-      if (sort) {
-        sort == 'new' ? order = 'DESC' : order = 'ASC'
-      }
-      const movies: Movie[] = await this.movieRepository.findAll({
-        attributes: [
-          'movieId',
-          'name',
-          'enName',
-          'type',
-          'rating',
-          'votes',
-          'movieLength',
-          'description',
-          'premiere',
-          'slogan',
-          'shortDescription',
-          'ageRating',
-          'poster',
-          'trailer',
-        ],
-        include: [
-          { model: Genre, as: 'genres', attributes: [], through: { attributes: [] } },
-          { model: Country, attributes: [], through: { attributes: [] } },
-          { model: PersonProfession, include: [ { model: Person, attributes: [] } ], attributes: [], through: { attributes: [] } },
-        ],
-        where: {
-          ...(search ? {
-            [Op.or]: [
-              { name: { [Op.iLike]: `%${search}%` } },
-              { enName: { [Op.iLike]: `%${search}%` } },
-            ]
-          } : {}),
-          ...(genres?.length ? {
-            '$genres.name$': {
-              [Op.in]: genres,
-            },
-          } : {}),
-          ...(person ? {
-            '$persons.person.name$': {
-              [Op.iLike]: `%${person}%`
-            }
-          } : {}),
-          ...(countries?.length ? {
-            '$countries.name$': {
-              [Op.in]: countries,
-            },
-          } : {}),
-          ...(rating ? {
-            rating: {
-              [Op.gte]: rating,
-            }
-          } : {}),
-          ...(votes ? {
-            votes: {
-              [Op.gte]: votes,
-            }
-          } : {}),
-        },
-        ...(sort ? {
-          order: [['premiere', order]]
-        } : {}),
-        group: ['Movie.movieId'],
-        having: {
-          ...(genres?.length ? {
-            [Op.and]: Sequelize.literal(`COUNT(DISTINCT CASE WHEN "genres"."name" IN (${genres.map(g => `'${g}'`).join(',')}) THEN "genres"."genreId" END) >= ${genres.length}`),
-          } : {}),
-          ...(countries?.length ? {
-            [Op.and]: Sequelize.literal(`COUNT(DISTINCT CASE WHEN "countries"."name" IN (${countries.map(c => `'${c}'`).join(',')}) THEN "countries"."name" END) >= ${countries.length}`),
-          } : {}),
-        },
-        subQuery: false,
-        limit: 10,
-        offset: ((page || 1) - 1) * 10,
-      });
-
-      //attach persons, genres, comments and countries
-      for (let i = 0; i < movies.length; i++) {
-        const personProfession = await movies[i].$get('persons', { include: [{ model: Person }, { model: Profession }] });
-        const sortedPersons: Map<string, Person[]> = new Map();
-        personProfession.forEach(person => {
-          if (sortedPersons.has(person.profession.name)) {
-            sortedPersons.set(person.profession.name, [...sortedPersons.get(person.profession.name), person.person]);
-          } else {
-            sortedPersons.set(person.profession.name, [person.person]);
-          }
-        })
-
-        const genres = await movies[i].$get('genres', {
-          joinTableAttributes: [],
-          attributes: ['genreId', 'name'],
-        } as any);
-
-        const countries = await movies[i].$get('countries', {
-          joinTableAttributes: [],
-          through: { attributes: [] }
-        } as any);
-
-        movies[i] = movies[i].toJSON();
-
-        movies[i].persons = Object.fromEntries(sortedPersons) as any;
-        movies[i].genres = genres as any;
-        movies[i].countries = countries as any;
-      }
-
-      // //attach genres
-      // for (let i = 0; i < movies.length; i++) {
-      //   const genres = await movies[i].$get('genres', {
-      //     joinTableAttributes: [],
-      //     attributes: ['genreId', 'name'],
-      //   } as any);
-
-      //   movies[i].setDataValue('genres', genres as any);
-      // }
-
-      return movies;
-    } catch (error) {
-      throw new RpcException(new BadRequestException(error.message));
+    const { genres, countries, person, page, rating, search, votes, sort } = filters;
+    let order: string;
+    if (sort) {
+      sort == 'new' ? order = 'DESC' : order = 'ASC'
     }
+    const movies: Movie[] = await this.movieRepository.findAll({
+      attributes: [
+        'movieId',
+        'name',
+        'enName',
+        'type',
+        'rating',
+        'votes',
+        'movieLength',
+        'description',
+        'premiere',
+        'slogan',
+        'shortDescription',
+        'ageRating',
+        'poster',
+        'trailer',
+      ],
+      include: [
+        { model: Genre, as: 'genres', attributes: [], through: { attributes: [] } },
+        { model: Country, attributes: [], through: { attributes: [] } },
+        { model: PersonProfession, include: [{ model: Person, attributes: [] }], attributes: [], through: { attributes: [] } },
+      ],
+      where: {
+        ...(search ? {
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { enName: { [Op.iLike]: `%${search}%` } },
+          ]
+        } : {}),
+        ...(genres?.length ? {
+          '$genres.name$': {
+            [Op.in]: genres,
+          },
+        } : {}),
+        ...(person ? {
+          '$persons.person.name$': {
+            [Op.iLike]: `%${person}%`
+          }
+        } : {}),
+        ...(countries?.length ? {
+          '$countries.name$': {
+            [Op.in]: countries,
+          },
+        } : {}),
+        ...(rating ? {
+          rating: {
+            [Op.gte]: rating,
+          }
+        } : {}),
+        ...(votes ? {
+          votes: {
+            [Op.gte]: votes,
+          }
+        } : {}),
+      },
+      ...(sort ? {
+        order: [['premiere', order]]
+      } : {}),
+      group: ['Movie.movieId'],
+      having: {
+        ...(genres?.length ? {
+          [Op.and]: Sequelize.literal(`COUNT(DISTINCT CASE WHEN "genres"."name" IN (${genres.map(g => `'${g}'`).join(',')}) THEN "genres"."genreId" END) >= ${genres.length}`),
+        } : {}),
+        ...(countries?.length ? {
+          [Op.and]: Sequelize.literal(`COUNT(DISTINCT CASE WHEN "countries"."name" IN (${countries.map(c => `'${c}'`).join(',')}) THEN "countries"."name" END) >= ${countries.length}`),
+        } : {}),
+      },
+      subQuery: false,
+      limit: 10,
+      offset: ((page || 1) - 1) * 10,
+    });
+
+    if (!movies.length) {
+      throw new RpcException(new NotFoundException('Фильмы не найдены'));
+    }
+
+    //attach persons, genres, comments and countries
+    for (let i = 0; i < movies.length; i++) {
+      const personProfession = await movies[i].$get('persons', { include: [{ model: Person }, { model: Profession }] });
+      const sortedPersons: Map<string, Person[]> = new Map();
+      personProfession.forEach(person => {
+        if (sortedPersons.has(person.profession.name)) {
+          sortedPersons.set(person.profession.name, [...sortedPersons.get(person.profession.name), person.person]);
+        } else {
+          sortedPersons.set(person.profession.name, [person.person]);
+        }
+      })
+
+      const genres = await movies[i].$get('genres', {
+        joinTableAttributes: [],
+        attributes: ['genreId', 'name'],
+      } as any);
+
+      const countries = await movies[i].$get('countries', {
+        joinTableAttributes: [],
+        through: { attributes: [] }
+      } as any);
+
+      movies[i] = movies[i].toJSON();
+
+      movies[i].persons = Object.fromEntries(sortedPersons) as any;
+      movies[i].genres = genres as any;
+      movies[i].countries = countries as any;
+    }
+
+    // //attach genres
+    // for (let i = 0; i < movies.length; i++) {
+    //   const genres = await movies[i].$get('genres', {
+    //     joinTableAttributes: [],
+    //     attributes: ['genreId', 'name'],
+    //   } as any);
+
+    //   movies[i].setDataValue('genres', genres as any);
+    // }
+
+    return movies;
   }
 
   async findOneMovie(id: number): Promise<any> {
@@ -183,7 +183,7 @@ export class MovieService {
   }
 
   async getMoviePersons(movieId: number): Promise<MoviePerson[]> {
-    const persons = await this.moviePersonRepository.findAll({
+    const persons: MoviePerson[] = await this.moviePersonRepository.findAll({
       include: [
         {
           model: PersonProfession,
@@ -197,6 +197,9 @@ export class MovieService {
       where: { movieId: movieId },
       attributes: [],
     });
+    if (!persons.length) {
+      throw new RpcException(new NotFoundException('Фильм с данным id не найден'));
+    }
     return persons;
   }
 
@@ -212,7 +215,7 @@ export class MovieService {
     return movie;
   }
   //#endregion
-  
+
   //#region comment
   getCommentTree(comments: Comment[]): Comment[] {
     const map = {};
@@ -240,7 +243,7 @@ export class MovieService {
   getAllGenres() {
     return this.genreRepository.findAll();
   }
-  
+
   updateGenre(dto: UpdateGenreDto): void {
     try {
       this.genreRepository.update({ name: dto.name }, { where: { genreId: dto.id } });

@@ -14,13 +14,12 @@ const logger = createLogger({
 export class RpcExceptionFilter implements ExceptionFilter {
   catch(exception: RpcException, host: ArgumentsHost) {
     const error: any = exception.getError();
-    
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     response
-    .status(error.statusCode)
+    .status(error.statusCode || 500)
     .json(error);
 
-    logger.error(error.message, { stack: error.stack });
+    logger.error(error.message, { stack: exception.stack });
   }
 }

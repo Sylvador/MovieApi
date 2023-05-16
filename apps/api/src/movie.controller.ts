@@ -1,13 +1,12 @@
-import { Body, Controller, Get, HttpCode, Inject, Param, ParseArrayPipe, Patch, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Inject, Param, ParseArrayPipe, Post, Query, UseGuards } from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { catchError, throwError } from "rxjs";
 import { AddCommentDto } from "./dto/add-comment.dto";
-import { UpdateMovieDto } from "./dto/update-movie.dto";
 import { FindAllMovieDto } from "../../movie-app/src/movie/dto/findAll-movie.dto";
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Movie } from "../../movie-app/src/movie/models/movie.model";
 import { AtGuard } from "./guards";
-import { GetCurrentUser, GetCurrentUserId } from "@app/common/decorators";
+import { GetCurrentUser } from "../../../libs/common/src/decorators";
 
 @ApiTags('Фильмы')
 @Controller('movie')
