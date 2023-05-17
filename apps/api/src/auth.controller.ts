@@ -3,7 +3,7 @@ import { Body, Controller, Get, HttpCode, Inject, Post, UseGuards } from "@nestj
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { Tokens } from "../../../libs/common/src/types";
 import { Observable, catchError, throwError } from "rxjs";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CreateUserDto } from "../../user/src/dto/create-user.dto";
 import { SignInDto } from "../../user/src/dto/signin.dto";
 import { AtGuard, GoogleAuthGuard, RtGuard, VKAuthGuard } from "./guards";
@@ -64,6 +64,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Выход', description: 'Удаляет токены доступа' })
   @ApiResponse({ status: 200, description: '' })
   @ApiResponse({ status: 403, description: 'Ошибка аутентификации' })
+  @ApiHeader({ name: 'Authorization', description: 'accessToken' })
   @HttpCode(200)
   @Post('logout')
   @UseGuards(AtGuard)
@@ -75,6 +76,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Обновление токенов доступа', description: 'Обновляет токены доступа' })
   @ApiResponse({ status: 200, description: 'Токены доступа обновлены' })
   @ApiResponse({ status: 403, description: 'Ошибка аутентификации' })
+  @ApiHeader({ name: 'Authorization', description: 'refreshToken' })
   @Post('refresh')
   @UseGuards(RtGuard)
   refresh(

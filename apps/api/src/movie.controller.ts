@@ -3,7 +3,7 @@ import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { catchError, throwError } from "rxjs";
 import { AddCommentDto } from "./dto/add-comment.dto";
 import { FindAllMovieDto } from "../../movie-app/src/movie/dto/findAll-movie.dto";
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiHeader, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Movie } from "../../movie-app/src/movie/models/movie.model";
 import { AtGuard } from "./guards";
 import { GetCurrentUser } from "../../../libs/common/src/decorators";
@@ -53,15 +53,18 @@ export class MovieController {
   @ApiOperation({ summary: 'Добавить комментарий', description: 'Добавляет комментарий к фильму' })
   @ApiResponse({ status: 201, description: 'Комментарий добавлен' })
   @ApiResponse({ status: 400, description: 'Некорректный запрос' })
+  @ApiParam({ name: 'movieId', description: 'Идентификатор фильма', type: 'number' })
+  @ApiHeader({ name: 'Authorization', description: 'accessToken' })
+  @ApiBody({ type: AddCommentDto })
   @HttpCode(201)
-  @Post('add-comment/:id')
+  @Post('add-comment/:movieId')
   @UseGuards(AtGuard)
   addComment(
-    @Param('id') id: number,
+    @Param('movieId', ParseIntPipe) movieId: number,
     @Body() dto: AddCommentDto,
     @GetCurrentUser('username') username: string,
   ) {
-    return this.movieClient.send('addComment', { movieId: id, username, ...dto })
+    return this.movieClient.send('addComment', { movieId, username, ...dto })
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
 
