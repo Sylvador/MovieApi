@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { AddCommentDto } from './dto/add-comment.dto';
 import { InjectModel } from "@nestjs/sequelize";
 import { Comment } from "./models/comment.model";
 import { MovieService } from "../movie/movie.service";
 import { RpcException } from "@nestjs/microservices";
+import { AddCommentDto } from 'apps/api/src/dto/add-comment.dto';
 
 @Injectable()
 export class CommentService {
@@ -11,7 +11,7 @@ export class CommentService {
     @InjectModel(Comment) private commentRepository: typeof Comment,
     private movieService: MovieService
   ) { }
-  async create(dto: AddCommentDto): Promise<Comment> {
+  async create(dto: AddCommentDto, movieId: number, userName: string): Promise<Comment> {
     await this.movieService.getModelById(dto.movieId);
     if (dto.parentId) {
       const comment = await this.getModelById(dto.parentId);
@@ -20,7 +20,7 @@ export class CommentService {
       }
 
     }
-    return this.commentRepository.create({ ...dto, publishDate: new Date(), userName: dto.username }, { returning: true });
+    return this.commentRepository.create({ ...dto, publishDate: new Date(), movieId, userName }, { returning: true });
   }
 
   async getModelById(id: number) {

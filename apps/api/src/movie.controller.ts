@@ -64,7 +64,7 @@ export class MovieController {
     @Body() dto: AddCommentDto,
     @GetCurrentUser('username') username: string,
   ) {
-    return this.movieClient.send('addComment', { movieId, username, ...dto })
+    return this.movieClient.send('addComment', { movieId, username, dto })
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
 
