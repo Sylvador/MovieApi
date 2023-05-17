@@ -18,20 +18,20 @@ export class MovieController {
   @ApiOperation({ summary: 'Поиск фильма', description: 'Находит фильм по его идентификатору' })
   @ApiResponse({ status: 200, description: 'Фильм найден', type: Movie })
   @ApiResponse({ status: 404, description: 'Фильм не найден' })
-  @ApiParam({ name: 'id', description: 'Идентификатор фильма', type: 'number' })
-  @Get('find-by-id/:id')
-  findOneMovie(@Param('id', ParseIntPipe) id: number) {
-    return this.movieClient.send('findOneMovie', id)
+  @ApiParam({ name: 'movieId', description: 'Идентификатор фильма', type: 'number' })
+  @Get('find-by-id/:movieId')
+  findOneMovie(@Param('movieId', ParseIntPipe) movieId: number) {
+    return this.movieClient.send('findOneMovie', movieId)
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
 
   @ApiOperation({ summary: 'Получение актеров фильма', description: 'Находит всех актеров фильма по его идентификатору' })
   @ApiResponse({ status: 200, description: 'Фильм найден', type: Movie })
   @ApiResponse({ status: 404, description: 'Фильм не найден' })
-  @ApiParam({ name: 'id', description: 'Идентификатор фильма', type: 'number' })
-  @Get(':id/persons')
-  getMoviePersons(@Param('id', ParseIntPipe) id: number) {
-    return this.movieClient.send('getMoviePersons', id)
+  @ApiParam({ name: 'movieId', description: 'Идентификатор фильма', type: 'number' })
+  @Get(':movieId/persons')
+  getMoviePersons(@Param('movieId', ParseIntPipe) movieId: number) {
+    return this.movieClient.send('getMoviePersons', movieId)
         .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
 
