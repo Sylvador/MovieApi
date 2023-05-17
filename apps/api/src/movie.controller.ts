@@ -3,11 +3,10 @@ import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { catchError, throwError } from "rxjs";
 import { AddCommentDto } from "./dto/add-comment.dto";
 import { FindAllMovieDto } from "../../movie-app/src/movie/dto/findAll-movie.dto";
-import { ApiBody, ApiHeader, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Movie } from "../../movie-app/src/movie/models/movie.model";
 import { AtGuard } from "./guards";
 import { GetCurrentUser } from "../../../libs/common/src/decorators";
-
 @ApiTags('Фильмы')
 @Controller('movie')
 export class MovieController {
@@ -54,8 +53,8 @@ export class MovieController {
   @ApiResponse({ status: 201, description: 'Комментарий добавлен' })
   @ApiResponse({ status: 400, description: 'Некорректный запрос' })
   @ApiParam({ name: 'movieId', description: 'Идентификатор фильма', type: 'number' })
-  @ApiHeader({ name: 'Authorization', description: 'accessToken' })
   @ApiBody({ type: AddCommentDto })
+  @ApiBearerAuth('jwt')
   @HttpCode(201)
   @Post('add-comment/:movieId')
   @UseGuards(AtGuard)

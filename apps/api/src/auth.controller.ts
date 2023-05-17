@@ -3,7 +3,7 @@ import { Body, Controller, Get, HttpCode, Inject, Post, UseGuards } from "@nestj
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { Tokens } from "../../../libs/common/src/types";
 import { Observable, catchError, throwError } from "rxjs";
-import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CreateUserDto } from "../../user/src/dto/create-user.dto";
 import { SignInDto } from "../../user/src/dto/signin.dto";
 import { AtGuard, GoogleAuthGuard, RtGuard, VKAuthGuard } from "./guards";
@@ -66,6 +66,7 @@ export class AuthController {
   @ApiResponse({ status: 403, description: 'Ошибка аутентификации' })
   @ApiHeader({ name: 'Authorization', description: 'accessToken' })
   @HttpCode(200)
+  @ApiBearerAuth('jwt')
   @Post('logout')
   @UseGuards(AtGuard)
   logout(@GetCurrentUserId() id: number) {
@@ -77,6 +78,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Токены доступа обновлены' })
   @ApiResponse({ status: 403, description: 'Ошибка аутентификации' })
   @ApiHeader({ name: 'Authorization', description: 'refreshToken' })
+  @ApiBearerAuth('jwt-refresh')
   @Post('refresh')
   @UseGuards(RtGuard)
   refresh(

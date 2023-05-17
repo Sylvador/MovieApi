@@ -15,7 +15,7 @@ import { PersonProfession } from "../person/models/person-profession.model";
 import { MoviePerson } from "../person/models/movie-person.model";
 import { Op, Sequelize } from "sequelize";
 import { FindAllMovieDto } from "./dto/findAll-movie.dto";
-import { UpdateGenreDto } from "./dto/update-genre.dto";
+import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
 
 @Injectable()
 export class MovieService {
@@ -241,7 +241,7 @@ export class MovieService {
 
   updateGenre(dto: UpdateGenreDto): void {
     try {
-      this.genreRepository.update({ name: dto.name }, { where: { genreId: dto.genreId } });
+      this.genreRepository.update(dto, { where: { genreId: dto.genreId } });
     } catch (error) {
       throw new RpcException(new InternalServerErrorException(error.message));
     }

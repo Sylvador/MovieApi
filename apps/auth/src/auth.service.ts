@@ -36,9 +36,13 @@ export class AuthService {
   async signin(signInDto: SignInDto): Promise<Tokens> {
     const user: User = await firstValueFrom(this.userClient.send('get_user_by_email', signInDto.email));
 
+    if (!user) {
+      throw new RpcException(new ForbiddenException('Invalid credentials'));
+    }
+
     const passwordMatches = await argon.verify(user.hashedPassword, signInDto.password);
 
-    if (!passwordMatches || !user) {
+    if (!passwordMatches) {
       throw new RpcException(new ForbiddenException('Invalid credentials'));
     }
 

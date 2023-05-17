@@ -12,10 +12,10 @@ export class CommentService {
     private movieService: MovieService
   ) { }
   async create(dto: AddCommentDto, movieId: number, userName: string): Promise<Comment> {
-    await this.movieService.getModelById(dto.movieId);
+    await this.movieService.getModelById(movieId);
     if (dto.parentId) {
       const comment = await this.getModelById(dto.parentId);
-      if (+comment.movieId !== +dto.movieId) {
+      if (+comment.movieId !== movieId) {
         throw new RpcException(new BadRequestException('id фильмов родительского и дочернего комментариев не совпадают'));
       }
 

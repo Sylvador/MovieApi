@@ -14,6 +14,8 @@ async function bootstrap() {
   
   const PORT = configService.get<string>('PORT');
   const config = new DocumentBuilder()
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'jwt')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'jwt-refresh')
     .setTitle('Movie API')
     .setDescription('Movie API description')
     .setVersion('1.0')

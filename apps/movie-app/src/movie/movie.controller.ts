@@ -2,13 +2,13 @@ import { Controller, InternalServerErrorException } from '@nestjs/common';
 import { EventPattern, MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { MovieService } from './movie.service';
 import { UpdateMovieDto } from './dto/update-movie.dto';
-import { UpdateGenreDto } from './dto/update-genre.dto';
-import {MoviePerson} from "../person/models/movie-person.model";
-import {FindAllMovieDto} from "./dto/findAll-movie.dto";
+import { MoviePerson } from "../person/models/movie-person.model";
+import { FindAllMovieDto } from "./dto/findAll-movie.dto";
+import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
 
 @Controller()
 export class MovieController {
-  constructor(private readonly movieService: MovieService) {}
+  constructor(private readonly movieService: MovieService) { }
 
   @MessagePattern('findAllMovie')
   async findAllMovie(@Payload('filters') filters: FindAllMovieDto) {
