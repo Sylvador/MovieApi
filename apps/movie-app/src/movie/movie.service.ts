@@ -112,15 +112,7 @@ export class MovieService {
 
     //attach persons, genres, comments and countries
     for (let i = 0; i < movies.length; i++) {
-      const personProfession = await movies[i].$get('persons', { include: [{ model: Person }, { model: Profession }] });
-      const sortedPersons: Map<string, Person[]> = new Map();
-      personProfession.forEach(person => {
-        if (sortedPersons.has(person.profession.name)) {
-          sortedPersons.set(person.profession.name, [...sortedPersons.get(person.profession.name), person.person]);
-        } else {
-          sortedPersons.set(person.profession.name, [person.person]);
-        }
-      })
+      const personProfessions = await movies[i].$get('persons', { include: [{ model: Person }, { model: Profession }] });
 
       const genres = await movies[i].$get('genres', {
         joinTableAttributes: [],
@@ -133,21 +125,11 @@ export class MovieService {
       } as any);
 
       movies[i] = movies[i].toJSON();
-
-      movies[i].persons = Object.fromEntries(sortedPersons) as any;
+      await this.sortPersons(personProfessions) as any;
+      movies[i].persons = await this.sortPersons(personProfessions) as any;
       movies[i].genres = genres as any;
       movies[i].countries = countries as any;
     }
-
-    // //attach genres
-    // for (let i = 0; i < movies.length; i++) {
-    //   const genres = await movies[i].$get('genres', {
-    //     joinTableAttributes: [],
-    //     attributes: ['genreId', 'name'],
-    //   } as any);
-
-    //   movies[i].setDataValue('genres', genres as any);
-    // }
 
     return movies;
   }
@@ -168,18 +150,31 @@ export class MovieService {
     }
     const similarMovies = await movie.$get('similarMovies', { include: [{ model: Movie }], attributes: { exclude: ['id', 'movieId1', 'movieId2'] } });
     movie.setDataValue('similarMovies', similarMovies);
-    const persons = await movie.$get('persons', {
+    const personProfessions = await movie.$get('persons', {
       include: [
         { model: Person },
         { model: Profession },
       ],
       attributes: [],
     });
-    movie.setDataValue('persons', persons);
+
     const commentsTree = this.getCommentTree(movie.comments)
     movie = movie.toJSON();
+    movie.persons = await this.sortPersons(personProfessions) as any;
     movie.comments = commentsTree;
     return movie;
+  }
+
+  async sortPersons(personProfessions: PersonProfession[]): Promise<{ [k: string]: Person[] }> {
+    const sortedPersons: Map<string, Person[]> = new Map();
+    personProfessions.forEach(personProfession => {
+      if (sortedPersons.has(personProfession.profession.name)) {
+        sortedPersons.set(personProfession.profession.name, [...sortedPersons.get(personProfession.profession.name), personProfession.person]);
+      } else {
+        sortedPersons.set(personProfession.profession.name, [personProfession.person]);
+      }
+    })
+    return Object.fromEntries(sortedPersons);
   }
 
   async getMoviePersons(movieId: number): Promise<MoviePerson[]> {
@@ -204,7 +199,7 @@ export class MovieService {
   }
 
   updateMovie(dto: UpdateMovieDto): void {
-    this.movieRepository.update(dto, { where: { movieId: dto.id } });
+    this.movieRepository.update({ name: dto.name, enName: dto.enName }, { where: { movieId: dto.movieId } });
   }
 
   async getModelById(id: number) {
@@ -246,7 +241,7 @@ export class MovieService {
 
   updateGenre(dto: UpdateGenreDto): void {
     try {
-      this.genreRepository.update({ name: dto.name }, { where: { genreId: dto.id } });
+      this.genreRepository.update({ name: dto.name }, { where: { genreId: dto.genreId } });
     } catch (error) {
       throw new RpcException(new InternalServerErrorException(error.message));
     }
