@@ -64,7 +64,6 @@ export class AuthController {
   @ApiOperation({ summary: 'Выход', description: 'Удаляет токены доступа' })
   @ApiResponse({ status: 200, description: '' })
   @ApiResponse({ status: 403, description: 'Ошибка аутентификации' })
-  @ApiHeader({ name: 'Authorization', description: 'accessToken' })
   @HttpCode(200)
   @ApiBearerAuth('jwt')
   @Post('logout')
@@ -77,7 +76,6 @@ export class AuthController {
   @ApiOperation({ summary: 'Обновление токенов доступа', description: 'Обновляет токены доступа' })
   @ApiResponse({ status: 200, description: 'Токены доступа обновлены' })
   @ApiResponse({ status: 403, description: 'Ошибка аутентификации' })
-  @ApiHeader({ name: 'Authorization', description: 'refreshToken' })
   @ApiBearerAuth('jwt-refresh')
   @Post('refresh')
   @UseGuards(RtGuard)
@@ -88,5 +86,15 @@ export class AuthController {
     console.log(userId, refreshToken);
     return this.authClient.send('refresh', { userId, refreshToken })
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
+  }
+
+  @ApiOperation({ summary: 'Получение данных пользователя', description: 'Возвращает данные пользователя по access токену' })
+  @ApiResponse({ status: 200, description: 'Данные пользователя' })
+  @ApiResponse({ status: 403, description: 'Неверный токен' })
+  @ApiBearerAuth('jwt')
+  @Get('get-user')
+  @UseGuards(AtGuard)
+  getUser(@GetCurrentUser() user: any) {
+    return user;
   }
 }
