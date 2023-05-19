@@ -1,22 +1,23 @@
-import {BelongsToMany, Column, DataType, Model, Table} from "sequelize-typescript";
-import {Movie} from "./movie.model";
-import {MovieGenre} from "./movie-genre.model";
+import { BelongsToMany, Column, DataType, Model, Table } from "sequelize-typescript";
+import { Movie } from "./movie.model";
+import { MovieGenre } from "./movie-genre.model";
 
 interface GenreCreationAttrs {
-    name: string;
+  name: string;
+  enName: string;
 }
 
-@Table({tableName: 'genre', createdAt: false, updatedAt: false})
+@Table({ tableName: 'genre', createdAt: false, updatedAt: false })
 export class Genre extends Model<Genre, GenreCreationAttrs> {
-    @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
-    genreId: number;
+  @Column({ type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
+  genreId: number;
 
-    @Column({type: DataType.STRING, unique: true, allowNull: false})
-    name: string;
+  @Column({ type: DataType.STRING, unique: true, allowNull: false })
+  name: string;
 
-    @Column({type: DataType.STRING, unique: true })
-    enname: string;
+  @Column({ type: DataType.STRING, unique: true })
+  enName: string;
 
-    @BelongsToMany(() => Movie, () => MovieGenre)
-    movies: Movie[];
+  @BelongsToMany(() => Movie, () => MovieGenre)
+  movies: Movie[];
 }

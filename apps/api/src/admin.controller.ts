@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Inject, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { catchError, throwError } from "rxjs";
-import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiBody, ApiHeader } from "@nestjs/swagger";
+import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiBody, ApiHeader, ApiBearerAuth } from "@nestjs/swagger";
 import { UpdateGenreDto } from "./dto/update-genre.dto";
-import { UpdateMovieDto } from "./dto/update-movie.dto";
 import { AdminGuard } from "./guards/admin.guard";
+import { UpdateMovieDto } from "apps/movie-app/src/movie/dto/update-movie.dto";
 
 @ApiTags('Администрирование')
 @UseGuards(AdminGuard)
@@ -18,29 +18,29 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'Жанр успешно обновлен' })
   @ApiResponse({ status: 400, description: 'Ошибка при обновлении жанра' })
   @ApiParam({ name: 'genreId', description: 'Идентификатор жанра', type: 'string' })
-  @ApiHeader({ name: 'Authorization', description: 'accessToken' })
   @ApiBody({ type: UpdateGenreDto })
+  @ApiBearerAuth('jwt')
   @Patch('genre/:genreId')
   updateGenre(
     @Param('genreId') genreId: string,
-    @Body('name') name: string
+    @Body() dto: UpdateGenreDto,
   ): void {
-    this.movieClient.emit('updateGenre', { genreId, name })
+    this.movieClient.emit('updateGenre', { genreId, dto })
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
 
   @ApiOperation({ summary: 'Обновление фильма', description: 'Обновляет название фильма по его идентификатору' })
   @ApiResponse({ status: 200, description: 'Фильм успешно обновлен' })
   @ApiResponse({ status: 400, description: 'Ошибка при обновлении фильма' })
-  @ApiHeader({ name: 'Authorization', description: 'accessToken' })
   @ApiParam({ name: 'movieId', description: 'Идентификатор фильма', type: 'number' })
   @ApiBody({ type: UpdateMovieDto })
+  @ApiBearerAuth('jwt')
   @Patch('movie/:movieId')
   updateMovie(
     @Param('movieId', ParseIntPipe) movieId: number,
-    @Body('name') name: string,
+    @Body() dto: UpdateMovieDto,
   ): void {
-    this.movieClient.emit('updateMovie', { movieId, name })
+    this.movieClient.emit('updateMovie', { movieId, dto })
       .pipe(catchError(err => throwError(() => new RpcException(err.response))));
   }
 }

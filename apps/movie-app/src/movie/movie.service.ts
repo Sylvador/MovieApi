@@ -142,7 +142,6 @@ export class MovieService {
         { model: Comment, attributes: { exclude: ['movieId'] } },
         { model: Language, through: { attributes: [] } },
         { model: Fact, attributes: { exclude: ['movieId'] } },
-        // { model: SimilarMovies, include: [{ model: Movie }], attributes: { exclude: ['id', 'movieId1', 'movieId2'] } },
       ],
     });
     if (!movie) {
@@ -198,8 +197,8 @@ export class MovieService {
     return persons;
   }
 
-  updateMovie(dto: UpdateMovieDto): void {
-    this.movieRepository.update({ name: dto.name, enName: dto.enName }, { where: { movieId: dto.movieId } });
+  updateMovie(movieId: number, dto: UpdateMovieDto): void {
+    this.movieRepository.update(dto, { where: { movieId } });
   }
 
   async getModelById(id: number) {
@@ -239,12 +238,8 @@ export class MovieService {
     return this.genreRepository.findAll();
   }
 
-  updateGenre(dto: UpdateGenreDto): void {
-    try {
-      this.genreRepository.update(dto, { where: { genreId: dto.genreId } });
-    } catch (error) {
-      throw new RpcException(new InternalServerErrorException(error.message));
-    }
+  updateGenre(genreId: number, dto: UpdateGenreDto): void {
+    this.genreRepository.update(dto, { where: { genreId } });
   }
   //#endregion
 

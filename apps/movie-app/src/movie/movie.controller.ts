@@ -71,9 +71,9 @@ export class MovieController {
   }
 
   @EventPattern('updateMovie')
-  async updateMovie(@Payload() dto: UpdateMovieDto): Promise<void> {
+  async updateMovie(@Payload('movieId') movieId: number, @Payload('dto') dto: UpdateMovieDto): Promise<void> {
     try {
-      this.movieService.updateMovie(dto);
+      this.movieService.updateMovie(movieId, dto);
     } catch (error) {
       if (error instanceof RpcException) {
         throw error;
@@ -83,9 +83,9 @@ export class MovieController {
   }
 
   @EventPattern('updateGenre')
-  async updateGenre(@Payload() dto: UpdateGenreDto): Promise<void> {
+  async updateGenre(@Payload('genreId') genreId: number, @Payload('dto') dto: UpdateGenreDto): Promise<void> {
     try {
-      this.movieService.updateGenre(dto);
+      this.movieService.updateGenre(genreId, dto);
     } catch (error) {
       if (error instanceof RpcException) {
         throw error;

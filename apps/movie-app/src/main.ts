@@ -13,6 +13,6 @@ async function bootstrap() {
   
   app.useGlobalPipes(new ValidationPipe());
   app.connectMicroservice(sharedService.getRmqOptions(configService.get<string>('MOVIE_QUEUE')));
-  app.startAllMicroservices();
+  app.startAllMicroservices().then(() => console.log('Microservice MOVIE-APP is listening'));
 }
 bootstrap();

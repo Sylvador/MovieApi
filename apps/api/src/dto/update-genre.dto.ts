@@ -1,8 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class UpdateGenreDto {
-    @ApiProperty({ description: 'Идентификатор жанра', type: 'number', example: 1 })
-    genreId: number;
+    // @ApiProperty({ description: 'Идентификатор жанра', type: 'number', example: 1 })
+    // genreId: number;
 
     @ApiProperty({ description: 'Название жанра', type: 'string', example: 'Экшн' })
     name?: string;
