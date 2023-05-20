@@ -67,7 +67,7 @@ describe('CommentService', () => {
       (movieService.getModelById as jest.Mock).mockResolvedValue({});
       (commentService['commentRepository'].create as jest.Mock).mockResolvedValue(createdComment);
       // jest.spyOn(commentRepository, 'create').mockResolvedValueOnce(createdComment)
-      const result = await commentService.create(dto);
+      const result = await commentService.create(dto, 1, 'John Doe');
       expect(result).toEqual(createdComment);
     });
 
@@ -90,7 +90,7 @@ describe('CommentService', () => {
       (movieService.getModelById as jest.Mock).mockResolvedValue({});
       // (commentService.getModelById as jest.Mock).mockImplementationOnce(() => parentComment);
       jest.spyOn(commentService, 'getModelById').mockResolvedValueOnce(parentComment as unknown as Comment)
-      await expect(commentService.create(dto)).rejects.toThrowError(new RpcException(new BadRequestException('id фильмов родительского и дочернего комментариев не совпадают')));
+      await expect(commentService.create(dto, 1, 'John Doe')).rejects.toThrowError(new RpcException(new BadRequestException('id фильмов родительского и дочернего комментариев не совпадают')));
     });
   });
 

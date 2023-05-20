@@ -4,7 +4,7 @@ import { MovieService } from './movie.service';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MoviePerson } from "../person/models/movie-person.model";
 import { FindAllMovieDto } from "./dto/findAll-movie.dto";
-import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
+import { UpdateGenreDto } from '../../../api/src/dto/update-genre.dto';
 import { Movie } from './models/movie.model';
 
 @Controller()

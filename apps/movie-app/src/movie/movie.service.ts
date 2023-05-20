@@ -106,7 +106,7 @@ export class MovieService {
       offset: ((page || 1) - 1) * 10,
     });
 
-    if (!movies.length) {
+    if (!movies?.length) {
       throw new RpcException(new NotFoundException('Фильмы не найдены'));
     }
 
@@ -127,8 +127,8 @@ export class MovieService {
       } as any);
 
       movies[i] = movies[i].toJSON();
-      await this.sortPersons(personProfessions) as any;
-      movies[i].persons = await this.sortPersons(personProfessions) as any;
+
+      if(personProfessions?.length) movies[i].persons = await this.sortPersons(personProfessions) as any;
       movies[i].genres = genres as any;
       movies[i].countries = countries as any;
     }
@@ -161,7 +161,7 @@ export class MovieService {
 
     const commentsTree = this.getCommentTree(movie.comments)
     movie = movie.toJSON();
-    movie.persons = await this.sortPersons(personProfessions) as any;
+    if (personProfessions?.length) movie.persons = await this.sortPersons(personProfessions) as any;
     movie.comments = commentsTree;
     return movie;
   }

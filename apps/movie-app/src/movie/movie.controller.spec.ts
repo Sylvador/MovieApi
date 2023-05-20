@@ -59,21 +59,21 @@ describe('MovieController', () => {
 
   describe('updateMovie', () => {
     it('should update a movie', async () => {
-      const dto: UpdateMovieDto = { id: 1, name: 'Updated Movie' };
+      const dto: UpdateMovieDto = { name: 'Updated Movie' };
       jest.spyOn(service, 'updateMovie').mockImplementation(() => of(null));
 
-      expect(await controller.updateMovie(dto)).toBeUndefined();
-      expect(service.updateMovie).toHaveBeenCalledWith(dto);
+      expect(await controller.updateMovie(1, dto)).toBeUndefined();
+      expect(service.updateMovie).toHaveBeenCalledWith(1, dto);
     });
   });
 
   describe('updateGenre', () => {
     it('should update a genre', async () => {
-      const dto: UpdateGenreDto = { id: 1, name: 'Обновлённый жанр', enName: 'Updated Genre' };
+      const dto: UpdateGenreDto = { name: 'Обновлённый жанр', enName: 'Updated Genre' };
       jest.spyOn(service, 'updateGenre').mockImplementation(() => of(null));
 
-      expect(await controller.updateGenre(dto)).toBeUndefined();
-      expect(service.updateGenre).toHaveBeenCalledWith(dto);
+      expect(await controller.updateGenre(1, dto)).toBeUndefined();
+      expect(service.updateGenre).toHaveBeenCalledWith(1, dto);
     });
   });
 });

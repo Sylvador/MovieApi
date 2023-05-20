@@ -18,12 +18,13 @@ import * as SequelizeMock from 'sequelize-mock';
 import { MoviePerson } from '../person/models/movie-person.model';
 import { PersonProfession } from '../person/models/person-profession.model';
 import { Person } from '../person/models/person.model';
+import { GroupedCountResultItem } from 'sequelize';
 
 describe('MovieService', () => {
   let movieService: MovieService;
   let movieRepository: typeof Movie;
   let genreRepository: typeof Genre;
-  
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -31,7 +32,7 @@ describe('MovieService', () => {
         {
           provide: getModelToken(Movie),
           useValue: {
-            findAll: jest.fn(),
+            findAndCountAll: jest.fn(),
             findByPk: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
@@ -73,14 +74,18 @@ describe('MovieService', () => {
   describe('findAllMovie', () => {
     it('should return an array of movies', async () => {
       const DBConnectionMock = new SequelizeMock();
-      const movieMock = DBConnectionMock.define('movies', {
-        'name': 'Test Movie',
-    });
+        const movieMock = DBConnectionMock.define('movies', {
+          'name': 'Test Movie',
+      });
+      const resultMock = { count: [{}] as unknown as GroupedCountResultItem[], rows: [movieMock]}
       const filters: FindAllMovieDto = { page: 1 };
-      jest.spyOn(movieRepository, 'findAll').mockResolvedValueOnce(movieMock);
-
-      expect(await movieService.findAllMovie(filters)).toBe(movieMock);
-      expect(movieRepository.findAll).toHaveBeenCalledWith({
+      jest.spyOn(movieRepository, 'findAndCountAll').mockResolvedValueOnce(resultMock);
+      movieMock.$get = jest.fn();
+      movieMock.toJSON = jest.fn().mockImplementationOnce(() => {
+        return movieMock;
+      });
+      expect(await movieService.findAllMovie(filters)).toEqual({ pageCount: 1, movies: [movieMock] });
+      expect(movieRepository.findAndCountAll).toHaveBeenCalledWith({
         attributes: [
           'movieId',
           'name',
@@ -100,7 +105,7 @@ describe('MovieService', () => {
         include: [
           { model: Genre, as: 'genres', attributes: [], through: { attributes: [] } },
           { model: Country, attributes: [], through: { attributes: [] } },
-          { model: PersonProfession, include: [ { model: Person, attributes: [] } ], attributes: [], through: { attributes: [] } },
+          { model: PersonProfession, include: [{ model: Person, attributes: [] }], attributes: [], through: { attributes: [] } },
         ],
         where: {},
         group: ['Movie.movieId'],
@@ -120,14 +125,12 @@ describe('MovieService', () => {
       });
       const movieMock = DBConnectionMock.define('movies', {
         'name': 'Test Movie',
-    });
-      console.log(movieMock)
+      });
       const movieId = 1;
       movieMock.id = movieId;
       movieMock.$get = jest.fn();
       movieMock.setDataValue = jest.fn();
       movieMock.toJSON = jest.fn().mockImplementationOnce(() => {
-        movieMock.comments = [];
         return movieMock;
       });
 
@@ -151,21 +154,21 @@ describe('MovieService', () => {
 
   describe('updateMovie', () => {
     it('should update a movie', async () => {
-      const dto: UpdateMovieDto = { id: 1, name: 'Updated Movie' };
+      const dto: UpdateMovieDto = { name: 'Updated Movie' };
       jest.spyOn(movieRepository, 'update').mockImplementation(() => Promise.resolve(null));
 
-      expect(await movieService.updateMovie(dto)).toBeUndefined();
-      expect(movieRepository.update).toHaveBeenCalledWith(dto, { where: { movieId: dto.id } });
+      expect(await movieService.updateMovie(1, dto)).toBeUndefined();
+      expect(movieRepository.update).toHaveBeenCalledWith(dto, { where: { movieId: 1 } });
     });
   });
 
   describe('updateGenre', () => {
     it('should update a genre', async () => {
-      const dto: UpdateGenreDto = { id: 1, name: 'Обновлённый жанр', enName: 'Updated Genre' };
+      const dto: UpdateGenreDto = { name: 'Обновлённый жанр', enName: 'Updated Genre' };
       jest.spyOn(genreRepository, 'update').mockImplementation(() => Promise.resolve(null));
 
-      expect(await movieService.updateGenre(dto)).toBeUndefined();
-      expect(genreRepository.update).toHaveBeenCalledWith({ name: dto.name }, { where: { genreId: dto.id } });
+      expect(movieService.updateGenre(1, dto)).toBeUndefined();
+      expect(genreRepository.update).toHaveBeenCalledWith({ name: dto.name, enName: dto.enName }, { where: { genreId: 1 } });
     });
   });
 
