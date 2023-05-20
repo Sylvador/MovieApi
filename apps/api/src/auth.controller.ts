@@ -1,5 +1,5 @@
 import { GetCurrentUser, GetCurrentUserId } from "../../../libs/common/src/decorators";
-import { Body, Controller, Get, HttpCode, Inject, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Inject, Post, Res, UseGuards } from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { Tokens } from "../../../libs/common/src/types";
 import { Observable, catchError, throwError } from "rxjs";
@@ -7,6 +7,7 @@ import { ApiBearerAuth, ApiHeader, ApiOperation, ApiResponse, ApiTags } from "@n
 import { CreateUserDto } from "../../user/src/dto/create-user.dto";
 import { SignInDto } from "../../user/src/dto/signin.dto";
 import { AtGuard, GoogleAuthGuard, RtGuard, VKAuthGuard } from "./guards";
+import { Response } from "express";
 
 @ApiTags('Авторизация')
 @Controller('auth')
@@ -25,8 +26,8 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Токены доступа' })
   @Get('google/redirect')
   @UseGuards(GoogleAuthGuard)
-  googleAuthRedirect(@GetCurrentUser() tokens: any) {
-    return tokens;
+  googleAuthRedirect(@GetCurrentUser() tokens: any, @Res() res: Response) {
+    res.redirect(`localhost:${process.env.FRONT_PORT}?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`);
   }
 
   @ApiOperation({ summary: 'Авторизация через VK', description: 'Перенаправляет на страницу авторизации VK' })
@@ -38,8 +39,8 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Токены доступа' })
   @Get('vk/redirect')
   @UseGuards(VKAuthGuard)
-  vkAuthRedirect(@GetCurrentUser() tokens: any) {
-    return tokens;
+  vkAuthRedirect(@GetCurrentUser() tokens: Tokens, @Res() res: Response) {
+    res.redirect(`localhost:${process.env.FRONT_PORT}?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`);
   }
 
   @ApiOperation({ summary: 'Регистрация', description: 'Создаёт нового пользователя' })
