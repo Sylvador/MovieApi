@@ -27,7 +27,7 @@ export class AuthController {
   @Get('google/redirect')
   @UseGuards(GoogleAuthGuard)
   googleAuthRedirect(@GetCurrentUser() tokens: any, @Res() res: Response) {
-    res.redirect(`localhost:${process.env.FRONT_PORT}?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`);
+    res.redirect(`http://localhost:${process.env.FRONT_PORT}?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`);
   }
 
   @ApiOperation({ summary: 'Авторизация через VK', description: 'Перенаправляет на страницу авторизации VK' })
@@ -40,7 +40,7 @@ export class AuthController {
   @Get('vk/redirect')
   @UseGuards(VKAuthGuard)
   vkAuthRedirect(@GetCurrentUser() tokens: Tokens, @Res() res: Response) {
-    res.redirect(`localhost:${process.env.FRONT_PORT}?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`);
+    res.redirect(`http://localhost:${process.env.FRONT_PORT}?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`);
   }
 
   @ApiOperation({ summary: 'Регистрация', description: 'Создаёт нового пользователя' })
