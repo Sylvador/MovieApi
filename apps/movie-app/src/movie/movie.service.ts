@@ -13,7 +13,7 @@ import { Comment } from "../comment/models/comment.model";
 import { SimilarMovies } from "./models/similar-movies.model";
 import { PersonProfession } from "../person/models/person-profession.model";
 import { MoviePerson } from "../person/models/movie-person.model";
-import { Op, Sequelize } from "sequelize";
+import { GroupedCountResultItem, Op, Sequelize } from "sequelize";
 import { FindAllMovieDto } from "./dto/findAll-movie.dto";
 import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
 
@@ -28,13 +28,13 @@ export class MovieService {
   ) { }
 
   //#region movie
-  async findAllMovie(filters: FindAllMovieDto): Promise<Movie[]> {
+  async findAllMovie(filters: FindAllMovieDto): Promise<{ pageCount: number; movies: Movie[]; }> {
     const { genres, countries, person, page, rating, search, votes, sort } = filters;
     let order: string;
     if (sort) {
       sort == 'new' ? order = 'DESC' : order = 'ASC'
     }
-    const movies: Movie[] = await this.movieRepository.findAll({
+    const { rows: movies, count }: { rows: Movie[], count: GroupedCountResultItem[] } = await this.movieRepository.findAndCountAll({
       attributes: [
         'movieId',
         'name',
@@ -110,6 +110,8 @@ export class MovieService {
       throw new RpcException(new NotFoundException('Фильмы не найдены'));
     }
 
+    const pageCount = count.length ? Math.ceil(count.length / 10) : 1;
+
     //attach persons, genres, comments and countries
     for (let i = 0; i < movies.length; i++) {
       const personProfessions = await movies[i].$get('persons', { include: [{ model: Person }, { model: Profession }] });
@@ -131,7 +133,7 @@ export class MovieService {
       movies[i].countries = countries as any;
     }
 
-    return movies;
+    return { pageCount, movies };
   }
 
   async findOneMovie(id: number): Promise<any> {

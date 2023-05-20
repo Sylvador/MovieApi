@@ -5,13 +5,14 @@ import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MoviePerson } from "../person/models/movie-person.model";
 import { FindAllMovieDto } from "./dto/findAll-movie.dto";
 import { UpdateGenreDto } from 'apps/api/src/dto/update-genre.dto';
+import { Movie } from './models/movie.model';
 
 @Controller()
 export class MovieController {
   constructor(private readonly movieService: MovieService) { }
 
   @MessagePattern('findAllMovie')
-  async findAllMovie(@Payload('filters') filters: FindAllMovieDto) {
+  async findAllMovie(@Payload('filters') filters: FindAllMovieDto): Promise<{ pageCount: number; movies: Movie[]; }> {
     try {
       return this.movieService.findAllMovie(filters);
     } catch (error) {
