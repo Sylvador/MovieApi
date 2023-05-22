@@ -37,13 +37,13 @@ export class AuthService {
     const user: User = await firstValueFrom(this.userClient.send('get_user_by_email', signInDto.email));
 
     if (!user) {
-      throw new RpcException(new ForbiddenException('Invalid credentials'));
+      throw new RpcException(new ForbiddenException('Неправильный логин или пароль'));
     }
 
     const passwordMatches = await argon.verify(user.hashedPassword, signInDto.password);
 
     if (!passwordMatches) {
-      throw new RpcException(new ForbiddenException('Invalid credentials'));
+      throw new RpcException(new ForbiddenException('Неправильный логин или пароль'));
     }
 
     const tokens = await this.tokenService.generateTokens(user);
