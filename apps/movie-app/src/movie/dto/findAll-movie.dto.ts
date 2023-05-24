@@ -10,12 +10,6 @@ export class FindAllMovieDto {
   @ApiProperty({ description: 'Строка поиска для фильтрации фильмов.', required: false})
   search?: string;
 
-  @ApiProperty({ description: 'Название фильма для фильтрации.', required: false})
-  name?: string;
-
-  @ApiProperty({ description: 'Английское название фильма для фильтрации.', required: false})
-  enName?: string;
-
   @ApiProperty({ description: 'Тип фильма для фильтрации.', required: false})
   type?: string;
 
