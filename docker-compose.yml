@@ -27,6 +27,7 @@ services:
 
     depends_on:
       - api
+      - postgres_user
 
     volumes:
       - .:/usr/src/app
@@ -44,6 +45,7 @@ services:
     
     depends_on:
       - api
+      - postgres_user
 
     volumes:
       - .:/usr/src/app
@@ -62,9 +64,42 @@ services:
 
     depends_on:
       - api
+      - postgres_movie
 
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
 
     command: npm run start:dev movie-app
+
+  
+  postgres_movie:
+    image: postgres
+    env_file:
+      - .development.env
+    
+    ports:
+      - 5431:5432
+
+    volumes:
+      - ./initdb.d/movie.initdb.sql:/docker-entrypoint-initdb.d/movie.initdb.sql
+      - ./movie_db/data:/var/lib/postgresql/movie/data
+      - ./dbbackup/movie-backup.sql:/dbbackup/movie-backup.sql
+
+  postgres_user:
+    image: postgres
+    env_file:
+      - .development.env
+
+    ports:
+      - 5433:5432
+
+    volumes:
+      - ./initdb.d/user.initdb.sql:/docker-entrypoint-initdb.d/user.initdb.sql
+      - ./user_db/data:/var/lib/postgresql/user/data
+      - ./dbbackup/user-backup.sql:/dbbackup/user-backup.sql
+
+volumes:
+  movie-app_db:
+  user_db:
+  initdb:
