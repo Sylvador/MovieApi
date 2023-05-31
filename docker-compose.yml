@@ -100,6 +100,6 @@ services:
       - ./dbbackup/user-backup.sql:/dbbackup/user-backup.sql
 
 volumes:
-  movie-app_db:
+  movie_db:
   user_db:
   initdb:
