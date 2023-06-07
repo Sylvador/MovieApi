@@ -33,7 +33,7 @@ docker exec -i <ID КОНТЕЙНЕРА postgres_user> pg_restore --verbose --cl
 ## Swagger Документация
 
 Документация по api находится на localhost:5000/api<br>
-Каждый метод можно тестировать же
+Каждый метод можно тестировать там же
 
 ## Тест
 
